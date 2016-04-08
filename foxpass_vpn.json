@@ -1,0 +1,58 @@
+{
+  "variables":{
+    "aws_access_key":"",
+    "aws_secret_key":""
+  },
+  "builders":[
+    {
+      "access_key":"{{user `aws_access_key`}}",
+      "secret_key":"{{user `aws_secret_key` }}",
+      "region":"us-west-2",
+      "source_ami":"ami-9abea4fb",
+      "type":"amazon-ebs",
+      "instance_type":"t2.nano",
+      "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
+      "ssh_username":"ubuntu",
+      "ssh_timeout" : "15m"
+    }
+  ],
+  "provisioners":[
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "scripts",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "file",
+      "source": "templates",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "file",
+      "source": "radius",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo /tmp/foxpass-vpn/setup.sh",
+        "sudo mkdir /opt/bin",
+        "sudo mv /tmp/foxpass-vpn/templates /opt/",
+        "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
+        "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
+        "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
+        "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
+        "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
+        "sudo mv /tmp/foxpass-vpn/radius/agent.py /opt/bin",
+        "sudo mv /tmp/foxpass-vpn/radius/upstart/foxpass-radius-agent.conf /etc/init",
+        "sudo chmod 755 /opt/bin/config.py"
+      ]
+    }
+  ]
+}

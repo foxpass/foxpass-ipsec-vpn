@@ -1,0 +1,5 @@
+/usr/sbin/service fail2ban restart || /bin/true
+/usr/sbin/service ipsec start
+/usr/sbin/service xl2tpd start
+echo 1 > /proc/sys/net/ipv4/ip_forward
+exit 0

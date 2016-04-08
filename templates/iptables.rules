@@ -1,0 +1,37 @@
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:ICMPALL - [0:0]
+-A INPUT -m conntrack --ctstate INVALID -j DROP
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A INPUT -i lo -j ACCEPT
+-A INPUT -d 127.0.0.0/8 -j REJECT
+-A INPUT -p icmp --icmp-type 255 -j ICMPALL
+-A INPUT -p udp --dport 67:68 --sport 67:68 -j ACCEPT
+-A INPUT -p tcp --dport 22 -j ACCEPT
+-A INPUT -p udp -m multiport --dports 500,4500 -j ACCEPT
+-A INPUT -p udp --dport 1701 -m policy --dir in --pol ipsec -j ACCEPT
+-A INPUT -p udp --dport 1701 -j DROP
+-A INPUT -j DROP
+-A FORWARD -m conntrack --ctstate INVALID -j DROP
+-A FORWARD -i eth+ -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i ppp+ -o eth+ -j ACCEPT
+# If you wish to allow traffic between VPN clients themselves, uncomment this line:
+# -A FORWARD -i ppp+ -o ppp+ -s <LOCAL_SUBNET> -d <LOCAL_SUBNET> -j ACCEPT
+-A FORWARD -j DROP
+-A ICMPALL -p icmp -f -j DROP
+-A ICMPALL -p icmp --icmp-type 0 -j ACCEPT
+-A ICMPALL -p icmp --icmp-type 3 -j ACCEPT
+-A ICMPALL -p icmp --icmp-type 4 -j ACCEPT
+-A ICMPALL -p icmp --icmp-type 8 -j ACCEPT
+-A ICMPALL -p icmp --icmp-type 11 -j ACCEPT
+-A ICMPALL -p icmp -j DROP
+COMMIT
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A POSTROUTING -s <LOCAL_SUBNET> -o eth+ -j SNAT --to-source "<PRIVATE_IP>"
+COMMIT

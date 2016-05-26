@@ -1,0 +1,57 @@
+{
+  "variables":{
+    "gcp_key_file":"",
+    "gcp_project_id":"",
+    "gcp_zone":""
+  },
+  "builders":[
+    {
+      "type":"googlecompute",
+      "account_file":"{{user `gcp_key_file`}}",
+      "project_id":"{{user `gcp_project_id`}}",
+      "source_image":"debian-8-jessie-v20160511",
+      "zone":"{{user `gcp_zone`}}",
+      "disk_size":20,
+      "image_name":"foxpass-ipsec-vpn-{{timestamp}}"
+    }
+  ],
+  "provisioners":[
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/google/vm-instance-id ]; do echo 'Waiting for instance boot...'; sleep 1; done"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "scripts",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "file",
+      "source": "templates",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "file",
+      "source": "radius",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo /tmp/foxpass-vpn/setup.sh",
+        "sudo mkdir /opt/bin",
+        "sudo mv /tmp/foxpass-vpn/templates /opt/",
+        "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
+        "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
+        "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
+        "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
+        "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
+        "sudo mv /tmp/foxpass-vpn/radius/agent.py /opt/bin",
+        "sudo mv /tmp/foxpass-vpn/radius/upstart/foxpass-radius-agent.conf /etc/init",
+        "sudo chmod 755 /opt/bin/config.py"
+      ]
+    }
+  ]
+}

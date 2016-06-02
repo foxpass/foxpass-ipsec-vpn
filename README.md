@@ -9,6 +9,10 @@ Note that you don't have to build it. We have ready-to-go AMIs on the AWS Market
 * Download and install Hashicorp's Packer (http://packer.io)
 * run `packer build foxpass_vpn.json`
 
+for Google Cloud Platform add necessary credential and configuration information variables according to the [documentation](https://www.packer.io/docs/templates/user-variables.html) :
+
+* run `packer build gcp_foxpass_vpn.json`
+
 ### How to run it
 
 * Instantiate an image with the resulting AMI

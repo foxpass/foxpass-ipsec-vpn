@@ -12,7 +12,7 @@
       "project_id":"{{user `gcp_project_id`}}",
       "source_image":"debian-8-jessie-v20160511",
       "zone":"{{user `gcp_zone`}}",
-      "disk_size":20,
+      "disk_size":10,
       "image_name":"foxpass-ipsec-vpn-{{timestamp}}"
     }
   ],
@@ -37,6 +37,16 @@
       "type": "file",
       "source": "radius",
       "destination": "/tmp/foxpass-vpn"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get -y update",
+        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libfreeradius-client2 xl2tpd fail2ban python-pyrad python-pip",
+        "sudo apt-get -y --no-install-recommends install xmlto",
+        "sudo pip install duo_client",
+        "sudo pip install iptools"
+      ]
     },
     {
       "type": "shell",

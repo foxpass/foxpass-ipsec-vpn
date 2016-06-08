@@ -19,6 +19,10 @@ Note that you don't have to build it. We have ready-to-go AMIs on the AWS Market
     * TCP 22 to your IP (for SSH management)
 * When the instance comes up, run `sudo /opt/bin/config.py`
 
+### How to set up your clients
+
+* [Mac OSX](https://foxpass.readme.io/docs/foxpass-ipsec-vpn-macosx)
+
 ### How to make changes
 
 * templates/ are the configuration templates that will be updated by the config.py script.

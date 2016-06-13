@@ -32,7 +32,9 @@ from os import chmod
 from re import match
 from shutil import copyfile
 from subprocess import call
-from urllib2 import urlopen
+from urllib2 import urlopen, Request
+
+METADATA_BASE_URL = "http://169.254.169.254/"
 
 def check_ip(target, default=None):
     while True:
@@ -86,6 +88,16 @@ def check_duo():
         else:
             print "Please enter 'y' or 'n'"
 
+def is_gce():
+    try:
+        response = urlopen(METADATA_BASE_URL)
+        try:
+            return response.info().get("Metadata-Flavor") == "Google"
+        finally:
+            response.close()
+    except Exception:
+        return False
+
 def gather_data():
     psk = prompt('Enter PSK', default=random_string(32))
     dns_prime = check_ip('Primary DNS', '8.8.8.8')
@@ -98,8 +110,15 @@ def gather_data():
     api_key = prompt('Foxpass API Key')
     radius_secret = random_string(16)
 
-    public_ip = urlopen('http://169.254.169.254/latest/meta-data/public-ipv4').read()
-    private_ip = urlopen('http://169.254.169.254/latest/meta-data/local-ipv4').read()
+    if is_gce():
+        headers = {'Metadata-Flavor': 'Google'}
+        request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip', headers=headers)
+        public_ip = urlopen(request).read()
+        request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/ip', headers=headers)
+        private_ip = urlopen(request).read()
+    else:
+        public_ip = urlopen('http://169.254.169.254/latest/meta-data/public-ipv4').read()
+        private_ip = urlopen('http://169.254.169.254/latest/meta-data/local-ipv4').read()
 
     holders = {'<PSK>': psk,
                '<DNS_PRIMARY>': dns_prime,

@@ -10,7 +10,7 @@
       "ssh_username": "packer",
       "account_file":"{{user `gcp_key_file`}}",
       "project_id":"{{user `gcp_project_id`}}",
-      "source_image":"debian-8-jessie-v20160511",
+      "source_image":"ubuntu-1404-trusty-v20160610",
       "zone":"{{user `gcp_zone`}}",
       "disk_size":10,
       "image_name":"foxpass-ipsec-vpn-{{timestamp}}"

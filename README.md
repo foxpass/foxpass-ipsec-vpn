@@ -1,12 +1,13 @@
 ### What it does
 
-This repo help you create an AMI image that offers a simple IPSEC/L2TP VPN server. Authentication will be checked against [Foxpass](https://www.foxpass.com) and optionally against [Duo](https://www.duo.com) for two-factor authentication.
+This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) for two-factor authentication (HIGHLY RECOMMENDED).
 
-Note that you don't have to build it. We have ready-to-go AMIs on the AWS Marketplace.
+Note that you don't have to build it. We have ready-to-go AMIs on the AWS Marketplace. (COMING SOON)
 
 ### How to build it
 
 * Download and install Hashicorp's Packer (http://packer.io)
+* Put your AWS access key and secret key someplace that Packer [can find them](https://www.packer.io/docs/builders/amazon.html#specifying-amazon-credentials).
 * run `packer build foxpass_vpn.json`
 
 for Google Cloud Platform add necessary credential and configuration information variables according to the [documentation](https://www.packer.io/docs/templates/user-variables.html) :
@@ -17,13 +18,19 @@ for Google Cloud Platform add necessary credential and configuration information
 
 * Instantiate an image with the resulting AMI
   * Make sure it has a public IP address
-  * Make sure it is in a security group with the following rules:
+  * Make sure it is in a security group with the following inbound rules:
     * UDP 500
     * UDP 4500
     * TCP 22 to your IP (for SSH management)
 * When the instance comes up, run `sudo /opt/bin/config.py`
 
+### How to set up your clients
+
+* [Mac OSX](https://foxpass.readme.io/docs/foxpass-ipsec-vpn-macosx)
+
 ### How to make changes
+
+Pull requests welcome!
 
 * templates/ are the configuration templates that will be updated by the config.py script.
 * scripts/ include the config.py script and the static configuration files that need to be installed.

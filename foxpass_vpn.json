@@ -13,7 +13,9 @@
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
       "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
+      "ssh_timeout" : "15m",
+      "ami_users": ["702773546451"],
+      "ami_regions": ["us-east-1", "us-west-1"]
     }
   ],
   "provisioners":[

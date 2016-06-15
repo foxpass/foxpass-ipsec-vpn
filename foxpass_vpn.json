@@ -8,14 +8,13 @@
       "access_key":"{{user `aws_access_key`}}",
       "secret_key":"{{user `aws_secret_key` }}",
       "region":"us-west-2",
-      "source_ami":"ami-9abea4fb",
+      "source_ami":"ami-6635cd06",
       "type":"amazon-ebs",
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
+      "ami_regions": ["us-east-1"],
       "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m",
-      "ami_users": ["702773546451"],
-      "ami_regions": ["us-east-1", "us-west-1"]
+      "ssh_timeout" : "15m"
     }
   ],
   "provisioners":[
@@ -23,6 +22,13 @@
       "type": "shell",
       "inline": [
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo rm /root/.ssh/authorized_keys",
+        "rm /home/ubuntu/.ssh/authorized_keys"
       ]
     },
     {

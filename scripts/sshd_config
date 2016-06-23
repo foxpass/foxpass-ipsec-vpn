@@ -10,7 +10,7 @@ ServerKeyBits 1024
 SyslogFacility AUTH
 LogLevel INFO
 LoginGraceTime 120
-PermitRootLogin without-password
+PermitRootLogin forced-commands-only
 StrictModes yes
 RSAAuthentication yes
 PubkeyAuthentication yes

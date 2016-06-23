@@ -8,6 +8,7 @@ Note that you don't have to build it. We have ready-to-go AMIs on the AWS Market
 
 * Download and install Hashicorp's Packer (http://packer.io)
 * Put your AWS access key and secret key someplace that Packer [can find them](https://www.packer.io/docs/builders/amazon.html#specifying-amazon-credentials).
+* set your region and base AMI (currently designed for Ubuntu 14.04 base images) in foxpass_vpn.json
 * run `packer build foxpass_vpn.json`
 
 for Google Cloud Platform :
@@ -24,7 +25,9 @@ for Google Cloud Platform :
     * UDP 500
     * UDP 4500
     * TCP 22 to your IP (for SSH management)
-* When the instance comes up, run `sudo /opt/bin/config.py`
+* When the instance comes up
+  * `ssh ubuntu@<hostname-or-ip>`
+  * `sudo /opt/bin/config.py`
 
 ### How to set up your clients
 

@@ -117,8 +117,8 @@ def gather_data():
         request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/ip', headers=headers)
         private_ip = urlopen(request).read()
     else:
-        public_ip = urlopen('http://169.254.169.254/latest/meta-data/public-ipv4').read()
-        private_ip = urlopen('http://169.254.169.254/latest/meta-data/local-ipv4').read()
+        public_ip = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
+        private_ip = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
 
     holders = {'<PSK>': psk,
                '<DNS_PRIMARY>': dns_prime,

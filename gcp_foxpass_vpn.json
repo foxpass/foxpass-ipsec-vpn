@@ -1,36 +1,26 @@
 {
   "variables":{
-    "aws_access_key":"",
-    "aws_secret_key":"",
-    "region":"us-west-2",
-    "source_ami":"ami-9abea4fb"
+    "gcp_key_file":"",
+    "gcp_project_id":"",
+    "gcp_zone":""
   },
   "builders":[
     {
-      "access_key":"{{user `aws_access_key`}}",
-      "secret_key":"{{user `aws_secret_key` }}",
-      "region":"{{user `region`}}",
-      "source_ami":"{{user `source_ami`}}",
-      "type":"amazon-ebs",
-      "instance_type":"t2.nano",
-      "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
-      "ami_regions": ["us-east-1"],
-      "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
+      "type":"googlecompute",
+      "ssh_username": "packer",
+      "account_file":"{{user `gcp_key_file`}}",
+      "project_id":"{{user `gcp_project_id`}}",
+      "source_image":"ubuntu-1404-trusty-v20160610",
+      "zone":"{{user `gcp_zone`}}",
+      "disk_size":10,
+      "image_name":"foxpass-ipsec-vpn-{{timestamp}}"
     }
   ],
   "provisioners":[
     {
       "type": "shell",
       "inline": [
-        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
-      ]
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo rm /root/.ssh/authorized_keys",
-        "rm /home/ubuntu/.ssh/authorized_keys"
+        "while [ ! -f /var/lib/google/vm-instance-id ]; do echo 'Waiting for instance boot...'; sleep 1; done"
       ]
     },
     {
@@ -52,7 +42,7 @@
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libradius1 xl2tpd fail2ban python-pyrad python-pip",
+        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libfreeradius-client2 xl2tpd fail2ban python-pyrad python-pip",
         "sudo apt-get -y --no-install-recommends install xmlto",
         "sudo pip install duo_client",
         "sudo pip install iptools"

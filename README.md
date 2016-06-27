@@ -11,6 +11,12 @@ Note that you don't have to build it. We have ready-to-go AMIs on the AWS Market
 * set your region and base AMI (currently designed for Ubuntu 14.04 base images) in foxpass_vpn.json
 * run `packer build foxpass_vpn.json`
 
+for Google Cloud Platform :
+
+* Get account file JSON if not building on a GCE instance as [described here](https://www.packer.io/docs/builders/googlecompute.html)
+* populate config variables via command line or variable file ([docs](https://www.packer.io/docs/templates/user-variables.html))
+* run `packer build gcp_foxpass_vpn.json`
+
 ### How to run it
 
 * Instantiate an image with the resulting AMI

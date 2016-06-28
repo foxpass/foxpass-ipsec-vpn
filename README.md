@@ -2,7 +2,7 @@
 
 This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) for two-factor authentication (HIGHLY RECOMMENDED).
 
-Note that you don't have to build it. We have ready-to-go AMIs on the AWS Marketplace. (COMING SOON)
+Note that you don't have to build it. We have ready-to-go, free-of-charge AMIs on the [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01HMLVKPS).
 
 ### How to build it
 

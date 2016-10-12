@@ -14,7 +14,6 @@
       "type":"amazon-ebs",
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
-      "ami_regions": ["us-east-1"],
       "ssh_username":"ubuntu",
       "ssh_timeout" : "15m"
     }
@@ -67,7 +66,6 @@
         "sudo mv /tmp/foxpass-vpn/templates /opt/",
         "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
         "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
-        "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
         "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
         "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",

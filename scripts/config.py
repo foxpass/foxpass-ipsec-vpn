@@ -183,7 +183,7 @@ def config_vpn(data):
     # chmod 0600 is r/w owner
     # chown 0 is set user to root
     chmod('/etc/ipsec.secrets',0600)
-    chown('/etc/ipsec.secrets',0)
+    chown('/etc/ipsec.secrets',0,0)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
     for command in commands:
         call(['service',command,'stop'], shell=False)

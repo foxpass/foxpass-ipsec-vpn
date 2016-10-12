@@ -6,6 +6,10 @@ Note that you don't have to build it. We have ready-to-go, free-of-charge AMIs o
 
 ### How to build it
 
+* Clone this repo
+* init and update the submodules:
+  * `git submodule init`
+  * `git submodule update`
 * Download and install Hashicorp's Packer (http://packer.io)
 * Put your AWS access key and secret key someplace that Packer [can find them](https://www.packer.io/docs/builders/amazon.html#specifying-amazon-credentials).
 * set your region and base AMI (currently designed for Ubuntu 14.04 base images) in foxpass_vpn.json

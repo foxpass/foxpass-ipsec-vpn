@@ -37,8 +37,9 @@ from shutil import copyfile
 from subprocess import call
 from urllib2 import urlopen, Request
 
+# require running as root
 if geteuid() != 0:
-    exit("Not running as run.\nconfig.py requires root privileges, please run again using sudo")
+    exit("Not running as root.\nconfig.py requires root privileges, please run again using sudo")
 
 METADATA_BASE_URL = "http://169.254.169.254/"
 
@@ -191,5 +192,7 @@ def config_vpn(data):
 
 if __name__ == '__main__':
     data = gather_data()
+
+    # ppp won't work if the hostname can't resolve, so make sure it's in /etc/hosts
     modify_etc_hosts(data)
     config_vpn(data)

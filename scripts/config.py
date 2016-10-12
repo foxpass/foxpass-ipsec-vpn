@@ -26,19 +26,19 @@
 
 
 import random
-from iptools import IpRange
-from iptools.ipv4 import validate_cidr
-from os import chown, chmod, urandom
-from re import match
-from shutil import copyfile
 import socket
 import string
+from iptools import IpRange
+from iptools.ipv4 import validate_cidr
+from os import chown, chmod, geteuid, urandom
+from python_hosts import Hosts, HostsEntry
+from re import match
+from shutil import copyfile
 from subprocess import call
 from urllib2 import urlopen, Request
 
-from iptools import IpRange
-from iptools.ipv4 import validate_cidr
-from python_hosts import Hosts, HostsEntry
+if geteuid() != 0:
+    exit("Not running as run.\nconfig.py requires root privileges, please run again using sudo")
 
 METADATA_BASE_URL = "http://169.254.169.254/"
 

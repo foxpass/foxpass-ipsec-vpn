@@ -71,7 +71,7 @@
         "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
         "sudo mv /tmp/foxpass-vpn/radius/agent.py /opt/bin",
         "sudo mv /tmp/foxpass-vpn/radius/upstart/foxpass-radius-agent.conf /etc/init",
-        "sudo chmod 755 /opt/bin/config.py"
+        "sudo chmod 744 /opt/bin/config.py"
       ]
     }
   ]

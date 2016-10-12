@@ -26,7 +26,7 @@
 -A ICMPALL -p icmp --icmp-type 4 -j ACCEPT
 -A ICMPALL -p icmp --icmp-type 8 -j ACCEPT
 -A ICMPALL -p icmp --icmp-type 11 -j ACCEPT
--A ICMPALL -p icmp -j DROP
+-A ICMPALL -j DROP
 COMMIT
 *nat
 :PREROUTING ACCEPT [0:0]

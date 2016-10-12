@@ -25,12 +25,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-import random,string
+import random
 from iptools import IpRange
 from iptools.ipv4 import validate_cidr
-from os import chmod
+from os import chown, chmod, urandom
 from re import match
 from shutil import copyfile
+import string
 from subprocess import call
 from urllib2 import urlopen, Request
 
@@ -68,8 +69,9 @@ def prompt(message, default=None):
         return raw_input( '%s: ' % (message) )
 
 def random_string(len):
+    system_random = random.SystemRandom()
     chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
-    arr = [random.choice(chars) for i in range(len)]
+    arr = [system_random.choice(chars) for i in range(len)]
     return ''.join(arr)
 
 def check_duo():
@@ -159,7 +161,11 @@ def config_vpn(holders,file_list):
         dest.close()
     commands = ['xl2tpd','ipsec','fail2ban', 'foxpass-radius-agent']
     call(['/sbin/sysctl','-p'])
+    # set /etc/ipsec.secrets to be owned and only accessible by root
+    # chmod 0600 is r/w owner
+    # chown 0 is set user to root
     chmod('/etc/ipsec.secrets',0600)
+    chown('/etc/ipsec.secrets',0)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
     for command in commands:
         call(['service',command,'stop'], shell=False)

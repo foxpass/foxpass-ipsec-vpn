@@ -1,0 +1,3 @@
+[submodule "foxpass-radius-agent"]
+	path = foxpass-radius-agent
+	url = https://github.com/foxpass/foxpass-radius-agent.git

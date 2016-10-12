@@ -1,6 +1,0 @@
-RADIUS_SECRET = '<RADIUS_SECRET>'
-API_SERVER = 'https://api.foxpass.com'
-API_KEY = '<API_KEY>'
-DUO_API_HOST = '<DUO_API_HOST>'
-DUO_IKEY = '<DUO_IKEY>'
-DUO_SKEY = '<DUO_SKEY>'

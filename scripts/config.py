@@ -26,13 +26,16 @@
 
 
 import random,string
-from iptools import IpRange
-from iptools.ipv4 import validate_cidr
 from os import chmod
 from re import match
 from shutil import copyfile
+import socket
 from subprocess import call
 from urllib2 import urlopen, Request
+
+from iptools import IpRange
+from iptools.ipv4 import validate_cidr
+from python_hosts import Hosts, HostsEntry
 
 METADATA_BASE_URL = "http://169.254.169.254/"
 
@@ -72,19 +75,16 @@ def random_string(len):
     arr = [random.choice(chars) for i in range(len)]
     return ''.join(arr)
 
-def check_duo():
+def get_duo_data():
     while True:
         duo_resp = prompt('Will you be using DUO for MFA: (y/N)', default='N')
         if (duo_resp == 'y' or duo_resp == 'Y'):
             host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
             ikey = prompt("DUO integration key")
             skey = prompt("DUO secret key")
-            return (host, ikey, skey)
+            return {'host': host, 'ikey': ikey, 'skey': skey}
         elif (duo_resp == 'n' or duo_resp == 'N'):
-            host = ''
-            ikey = ''
-            skey = ''
-            return (host, ikey, skey)
+            return None
         else:
             print "Please enter 'y' or 'n'"
 
@@ -99,40 +99,58 @@ def is_gce():
         return False
 
 def gather_data():
-    psk = prompt('Enter PSK', default=random_string(32))
-    dns_prime = check_ip('Primary DNS', '8.8.8.8')
-    dns_second = check_ip('Secondary DNS', '8.8.4.4')
-    local_cidr = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
-    local_ip = IpRange(local_cidr)[1]
-    local_ip_range = IpRange(local_cidr)[10] + '-' + IpRange(local_cidr)[len(IpRange(local_cidr))-5]
-    duo = check_duo()
+    data = {}
 
-    api_key = prompt('Foxpass API Key')
-    radius_secret = random_string(16)
+    data['psk'] = prompt('Enter PSK', default=random_string(32))
+    data['dns_prime'] = check_ip('Primary DNS', '8.8.8.8')
+    data['dns_second'] = check_ip('Secondary DNS', '8.8.4.4')
+    data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
+    data['local_ip'] = IpRange(data['local_cidr'])[1]
+    data['local_ip_range'] = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
+    data['duo_config'] = get_duo_data()
 
-    if is_gce():
+    data['api_key'] = prompt('Foxpass API Key')
+    data['radius_secret'] = random_string(16)
+
+    data['is_gce'] = is_gce()
+
+    if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
         request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip', headers=headers)
-        public_ip = urlopen(request).read()
+        data['public_ip'] = urlopen(request).read()
         request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/ip', headers=headers)
-        private_ip = urlopen(request).read()
+        data['private_ip'] = urlopen(request).read()
     else:
-        public_ip = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
-        private_ip = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
+        data['public_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
+        data['private_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
 
-    holders = {'<PSK>': psk,
-               '<DNS_PRIMARY>': dns_prime,
-               '<DNS_SECONDARY>': dns_second,
-               '<IP_RANGE>': local_ip_range,
-               '<LOCAL_IP>': local_ip,
-               '<LOCAL_SUBNET>': local_cidr,
-               '<PUBLIC_IP>': public_ip,
-               '<PRIVATE_IP>': private_ip,
-               '<RADIUS_SECRET>': radius_secret,
-               '<API_KEY>': api_key,
-               '<DUO_API_HOST>': duo[0],
-               '<DUO_IKEY>': duo[1],
-               '<DUO_SKEY>': duo[2]
+    return data
+
+def modify_etc_hosts(data):
+    private_ip = data['private_ip']
+    hostname = socket.gethostname()
+
+    hosts = Hosts()
+    new_entry = HostsEntry(entry_type='ipv4',
+                           address=private_ip,
+                           names=[hostname])
+    hosts.add([new_entry])
+    hosts.write()
+
+def config_vpn(data):
+    holders = {'<PSK>': data['psk'],
+               '<DNS_PRIMARY>': data['dns_prime'],
+               '<DNS_SECONDARY>': data['dns_second'],
+               '<IP_RANGE>': data['local_ip_range'],
+               '<LOCAL_IP>': data['local_ip'],
+               '<LOCAL_SUBNET>': data['local_cidr'],
+               '<PUBLIC_IP>': data['public_ip'],
+               '<PRIVATE_IP>': data['private_ip'],
+               '<RADIUS_SECRET>': data['radius_secret'],
+               '<API_KEY>': data['api_key'],
+               '<DUO_API_HOST>': data['duo_config'].get('host', '') if data['duo_config'] else '',
+               '<DUO_IKEY>': data['duo_config'].get('ikey', '') if data['duo_config'] else '',
+               '<DUO_SKEY>': data['duo_config'].get('skey', '') if data['duo_config'] else ''
                }
 
     file_list = {'ipsec.secrets': '/etc/',
@@ -140,12 +158,10 @@ def gather_data():
                  'options.xl2tpd': '/etc/ppp/',
                  'xl2tpd.conf': '/etc/xl2tpd/',
                  'ipsec.conf':'/etc/',
-                 'radius_agent_config.py': '/opt/bin/',
+                 'foxpass-radius-agent.conf': '/etc/',
                  'servers': '/etc/radiusclient/'}
 
-    return {'holders':holders, 'file_list':file_list}
 
-def config_vpn(holders,file_list):
     templates = '/opt/templates'
     files = {}
     for file in file_list.iterkeys():
@@ -167,4 +183,5 @@ def config_vpn(holders,file_list):
 
 if __name__ == '__main__':
     data = gather_data()
-    config_vpn(data['holders'],data['file_list'])
+    modify_etc_hosts(data)
+    config_vpn(data)

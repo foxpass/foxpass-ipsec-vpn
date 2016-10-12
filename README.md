@@ -39,7 +39,7 @@ Pull requests welcome!
 
 * templates/ are the configuration templates that will be updated by the config.py script.
 * scripts/ include the config.py script and the static configuration files that need to be installed.
-* radius/ is the radius agent that connects L2TP to Foxpass and Duo authentication APIs.
+* foxpass-radius-agent/ is a submodule [(See here)](https://github.com/foxpass/foxpass-radius-agent) that contains a radius agent that connects L2TP to Foxpass and Duo authentication APIs.
 
 ### Thank you
 * Huge thank-you to [Travis Theune](https://github.com/ttheune) who was an instrumental collaborator throughout the design, implementation, and testing.

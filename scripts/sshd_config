@@ -27,5 +27,4 @@ TCPKeepAlive yes
 AcceptEnv LANG LC_*
 UsePAM yes
 Ciphers aes128-ctr,aes192-ctr,aes256-ctr,arcfour256
-MACs hmac-sha2-256,hmac-sha2-256-96,hmac-sha2-512,hmac-sha2-512-96,hmac-md5,hmac-sha1,umac-64@openssh
-#ForceCommand sudo /opt/bin/config.py
+MACs hmac-sha2-256,hmac-sha2-512,hmac-md5,hmac-sha1,umac-64@openssh.com,umac-128@openssh.com

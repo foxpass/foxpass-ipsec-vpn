@@ -14,7 +14,6 @@
       "type":"amazon-ebs",
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{timestamp}}",
-      "ami_regions": ["us-east-1"],
       "ssh_username":"ubuntu",
       "ssh_timeout" : "15m"
     }
@@ -45,7 +44,7 @@
     },
     {
       "type": "file",
-      "source": "radius",
+      "source": "foxpass-radius-agent",
       "destination": "/tmp/foxpass-vpn"
     },
     {
@@ -55,7 +54,8 @@
         "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libradius1 xl2tpd fail2ban python-pyrad python-pip",
         "sudo apt-get -y --no-install-recommends install xmlto",
         "sudo pip install duo_client",
-        "sudo pip install iptools"
+        "sudo pip install iptools",
+        "sudo pip install python-hosts"
       ]
     },
     {
@@ -69,8 +69,8 @@
         "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
         "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
         "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
-        "sudo mv /tmp/foxpass-vpn/radius/agent.py /opt/bin",
-        "sudo mv /tmp/foxpass-vpn/radius/upstart/foxpass-radius-agent.conf /etc/init",
+        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
+        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/upstart/foxpass-radius-agent.conf /etc/init",
         "sudo chmod 744 /opt/bin/config.py"
       ]
     }

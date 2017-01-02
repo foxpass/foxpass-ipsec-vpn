@@ -29,9 +29,36 @@ for Google Cloud Platform :
     * UDP 500
     * UDP 4500
     * TCP 22 to your IP (for SSH management)
+  * (optional, see below) for AWS: setup script can pull config from S3. Set role and user-data as described below.
+
 * When the instance comes up
-  * `ssh ubuntu@<hostname-or-ip>`
-  * `sudo /opt/bin/config.py`
+
+  ```
+  ssh ubuntu@<hostname-or-ip>
+  sudo /opt/bin/config.py
+  ```
+
+* To automatically pull config from S3:
+  * Set EC2 user-data to (this will run the config script on startup)
+
+   ```
+    #!/bin/bash
+    sudo /opt/bin/config.py s3://bucket-name/path/to/config.json
+   ```
+
+  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3.
+  * Upload the config file with the following format (duo_config is optional):
+
+   ```
+   {
+    "psk": "MAKE_UP_A_SECURE_SHARED_KEY",
+    "dns_primary": "8.8.8.8",
+    "dns_secondary": "8.8.4.4",
+    "local_cidr": "10.11.12.0/24",
+    "foxpass_api_key": "PUT_YOUR_FOXPASS_API_KEY_HERE",
+    "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"}
+   }
+   ```
 
 ### How to set up your clients
 

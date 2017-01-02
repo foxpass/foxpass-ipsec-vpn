@@ -3,7 +3,7 @@
     "aws_access_key":"",
     "aws_secret_key":"",
     "region":"us-west-2",
-    "source_ami":"ami-9abea4fb"
+    "source_ami":"ami-34913254"
   },
   "builders":[
     {
@@ -55,7 +55,8 @@
         "sudo apt-get -y --no-install-recommends install xmlto",
         "sudo pip install duo_client",
         "sudo pip install iptools",
-        "sudo pip install python-hosts"
+        "sudo pip install python-hosts",
+        "sudo pip install boto"
       ]
     },
     {

@@ -24,18 +24,23 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+# system libs
+import json
 import random
 import socket
 import string
-from iptools import IpRange
-from iptools.ipv4 import validate_cidr
+import sys
 from os import chown, chmod, geteuid, urandom
-from python_hosts import Hosts, HostsEntry
 from re import match
 from shutil import copyfile
 from subprocess import call
 from urllib2 import urlopen, Request
+from urlparse import urlparse
+
+# third party libs
+from iptools import IpRange
+from iptools.ipv4 import validate_cidr
+from python_hosts import Hosts, HostsEntry
 
 # require running as root
 if geteuid() != 0:
@@ -87,7 +92,7 @@ def get_duo_data():
             host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
             ikey = prompt("DUO integration key")
             skey = prompt("DUO secret key")
-            return {'host': host, 'ikey': ikey, 'skey': skey}
+            return {'api_host': host, 'ikey': ikey, 'skey': skey}
         elif (duo_resp == 'n' or duo_resp == 'N'):
             return None
         else:
@@ -103,18 +108,49 @@ def is_gce():
     except Exception:
         return False
 
-def gather_data():
+def gather_user_data_prompt():
     data = {}
 
     data['psk'] = prompt('Enter PSK', default=random_string(32))
-    data['dns_prime'] = check_ip('Primary DNS', '8.8.8.8')
-    data['dns_second'] = check_ip('Secondary DNS', '8.8.4.4')
+    data['dns_primary'] = check_ip('Primary DNS', '8.8.8.8')
+    data['dns_secondary'] = check_ip('Secondary DNS', '8.8.4.4')
     data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
-    data['local_ip'] = IpRange(data['local_cidr'])[1]
-    data['local_ip_range'] = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
-    data['duo_config'] = get_duo_data()
 
-    data['api_key'] = prompt('Foxpass API Key')
+    duo_config = get_duo_data()
+    if duo_config:
+        data['duo_config'] = duo_config
+
+    data['foxpass_api_key'] = prompt('Foxpass API Key')
+
+    return data
+
+def gather_user_data_s3(s3_url):
+    import boto
+    from boto.s3.connection import S3Connection
+
+    parts = urlparse(s3_url)
+
+    if parts.scheme != 's3':
+        raise Exception("Must use s3 url scheme")
+
+    bucket_name = parts.netloc
+    path = parts.path
+
+    conn = boto.connect_s3()
+    bucket = conn.get_bucket(bucket_name)
+    if not bucket:
+        raise Exception("Can't find bucket '%s'" % bucket_name)
+
+    key = bucket.get_key(path)
+    if not key:
+        raise Exception("Can't find file '%s'" % path)
+
+    data = key.get_contents_as_string()
+    return json.loads(data)
+
+def get_machine_data():
+    data = {}
+
     data['radius_secret'] = random_string(16)
 
     data['is_gce'] = is_gce()
@@ -143,20 +179,33 @@ def modify_etc_hosts(data):
     hosts.write()
 
 def config_vpn(data):
+
+    duo_api_host = ''
+    duo_ikey = ''
+    duo_skey = ''
+
+    if 'duo_config' in data:
+        duo_api_host = data['duo_config'].get('api_host')
+        duo_ikey = data['duo_config'].get('ikey')
+        duo_skey = data['duo_config'].get('skey')
+
+    local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
+    local_ip = IpRange(data['local_cidr'])[1]
+
     holders = {'<PSK>': data['psk'],
-               '<DNS_PRIMARY>': data['dns_prime'],
-               '<DNS_SECONDARY>': data['dns_second'],
-               '<IP_RANGE>': data['local_ip_range'],
-               '<LOCAL_IP>': data['local_ip'],
+               '<DNS_PRIMARY>': data['dns_primary'],
+               '<DNS_SECONDARY>': data['dns_secondary'],
+               '<IP_RANGE>': local_ip_range,
+               '<LOCAL_IP>': local_ip,
                '<LOCAL_SUBNET>': data['local_cidr'],
                '<PUBLIC_IP>': data['public_ip'],
                '<PRIVATE_IP>': data['private_ip'],
                '<RADIUS_SECRET>': data['radius_secret'],
-               '<API_KEY>': data['api_key'],
-               '<DUO_API_HOST>': data['duo_config'].get('host', '') if data['duo_config'] else '',
-               '<DUO_IKEY>': data['duo_config'].get('ikey', '') if data['duo_config'] else '',
-               '<DUO_SKEY>': data['duo_config'].get('skey', '') if data['duo_config'] else ''
-               }
+               '<API_KEY>': data['foxpass_api_key'],
+               '<DUO_API_HOST>': duo_api_host,
+               '<DUO_IKEY>': duo_ikey,
+               '<DUO_SKEY>': duo_skey,
+              }
 
     file_list = {'ipsec.secrets': '/etc/',
                  'iptables.rules': '/etc/',
@@ -190,9 +239,21 @@ def config_vpn(data):
         call(['service',command,'stop'], shell=False)
         call(['service',command,'start'], shell=False)
 
-if __name__ == '__main__':
-    data = gather_data()
+def main():
+    # only allowed argument is pointer to s3 json file
+    if len(sys.argv) > 1:
+        data = gather_user_data_s3(sys.argv[1])
+    else:
+        data = gather_user_data_prompt()
+
+    # update with machine data
+    machine_data = get_machine_data()
+    data.update(machine_data)
 
     # ppp won't work if the hostname can't resolve, so make sure it's in /etc/hosts
     modify_etc_hosts(data)
     config_vpn(data)
+
+
+if __name__ == '__main__':
+    main()

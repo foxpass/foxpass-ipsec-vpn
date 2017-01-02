@@ -46,7 +46,7 @@ for Google Cloud Platform :
     sudo /opt/bin/config.py s3://bucket-name/path/to/config.json
    ```
 
-  * Set EC2 role to a role in IAM that has permission to the above-mentioned bucket/path in S3.
+  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3.
   * Upload the config file with the following format (duo_config is optional):
 
    ```

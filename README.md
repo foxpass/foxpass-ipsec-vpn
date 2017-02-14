@@ -56,7 +56,8 @@ for Google Cloud Platform :
     "dns_secondary": "8.8.4.4",
     "local_cidr": "10.11.12.0/24",
     "foxpass_api_key": "PUT_YOUR_FOXPASS_API_KEY_HERE",
-    "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"}
+    "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"},
+    "require_groups": ["group_1", "group_2"]
    }
    ```
 

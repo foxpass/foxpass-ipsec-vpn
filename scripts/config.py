@@ -122,6 +122,11 @@ def gather_user_data_prompt():
 
     data['foxpass_api_key'] = prompt('Foxpass API Key')
 
+    require_groups = prompt('Limit to groups (comma-separated)')
+
+    if require_groups:
+        data['require_groups'] = require_groups.split(',')
+
     return data
 
 def gather_user_data_s3(s3_url):
@@ -147,6 +152,9 @@ def gather_user_data_s3(s3_url):
 
     data = key.get_contents_as_string()
     return json.loads(data)
+
+def gather_user_data_file(filename):
+    return json.load(file(filename))
 
 def get_machine_data():
     data = {}
@@ -202,6 +210,7 @@ def config_vpn(data):
                '<PRIVATE_IP>': data['private_ip'],
                '<RADIUS_SECRET>': data['radius_secret'],
                '<API_KEY>': data['foxpass_api_key'],
+               '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',
                '<DUO_API_HOST>': duo_api_host,
                '<DUO_IKEY>': duo_ikey,
                '<DUO_SKEY>': duo_skey,
@@ -240,9 +249,12 @@ def config_vpn(data):
         call(['service',command,'start'], shell=False)
 
 def main():
-    # only allowed argument is pointer to s3 json file
+    # only allowed argument is pointer to json file on-disk or in s3
     if len(sys.argv) > 1:
-        data = gather_user_data_s3(sys.argv[1])
+        if sys.argv[1].startswith('s3:'):
+           data = gather_user_data_s3(sys.argv[1])
+        else:
+           data = gather_user_data_file(sys.argv[1])
     else:
         data = gather_user_data_prompt()
 

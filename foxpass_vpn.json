@@ -48,6 +48,11 @@
       "destination": "/tmp/foxpass-vpn"
     },
     {
+      "type": "file",
+      "source": "requirements.txt",
+      "destination": "/tmp/foxpass-vpn"
+    },
+    {
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",

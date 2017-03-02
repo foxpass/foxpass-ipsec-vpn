@@ -48,10 +48,15 @@
       "destination": "/tmp/foxpass-vpn"
     },
     {
+      "type": "file",
+      "source": "requirements.txt",
+      "destination": "/tmp/foxpass-vpn/"
+    },
+    {
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libradius1 xl2tpd fail2ban python-pyrad python-pip",
+        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libradius1 xl2tpd fail2ban python-pyrad python-pip python-all-dev",
         "sudo apt-get -y --no-install-recommends install xmlto",
         "sudo pip install -r /tmp/foxpass-vpn/requirements.txt",
         "sudo pip install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"

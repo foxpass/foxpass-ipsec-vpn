@@ -50,7 +50,7 @@
     {
       "type": "file",
       "source": "requirements.txt",
-      "destination": "/tmp/foxpass-vpn"
+      "destination": "/tmp/foxpass-vpn/"
     },
     {
       "type": "shell",

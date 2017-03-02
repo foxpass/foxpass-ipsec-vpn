@@ -1,0 +1,8 @@
+{"psk": "1234",
+ "dns_primary": "8.8.8.8",
+ "dns_secondary": "8.8.4.4",
+ "local_cidr": "10.11.12.0/24",
+ "foxpass_api_key": "abcdefg",
+ "require_groups" : ["group_1", "group_2"],
+ "duo_config": {"api_host": "api.host", "skey": "skey!", "ikey": "ikey!"}
+}

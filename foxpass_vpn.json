@@ -51,8 +51,33 @@
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libradius1 xl2tpd fail2ban python-pyrad python-pip",
+        "sudo apt-get -y install \
+          bison \
+          fail2ban \
+          flex \
+          dnsutils \
+          gcc \
+          libcap-ng-dev \
+          libcap-ng-utils \
+          libcurl4-nss-dev \
+          libevent-dev \
+          libffi-dev \
+          libnspr4-dev \
+          libnss3-dev \
+          libnss3-tools \
+          libpam0g-dev \
+          libradius1 \
+          libselinux1-dev \
+          libssl-dev \
+          libunbound-dev \
+          make \
+          pkg-config \
+          python-pip \
+          python-pyrad \
+          wget \
+          xl2tpd",
         "sudo apt-get -y --no-install-recommends install xmlto",
+        "sudo apt-get -y remove python-openssl",
         "sudo pip install -r /tmp/foxpass-vpn/requirements.txt",
         "sudo pip install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
       ]

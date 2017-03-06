@@ -1,3 +1,6 @@
 boto==2.45.0
 iptools==0.6.1
+ndg-httpsclient==
+pyasn1==
 python-hosts==0.3.7
+pyOpenSSL==

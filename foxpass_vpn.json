@@ -1,102 +1,78 @@
 {
-  "variables":{
-    "aws_access_key":"",
-    "aws_secret_key":"",
-    "region":"us-west-2",
-    "source_ami":"ami-4c0bb02c"
-  },
-  "builders":[
-    {
-      "access_key":"{{user `aws_access_key`}}",
-      "secret_key":"{{user `aws_secret_key` }}",
-      "region":"{{user `region`}}",
-      "source_ami":"{{user `source_ami`}}",
-      "type":"amazon-ebs",
-      "instance_type":"t2.nano",
-      "ami_name":"foxpass-ipsec-vpn {{isotime \"2006-01-02 15.04\"}}",
-      "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
-    }
-  ],
-  "provisioners":[
-    {
-      "type": "shell",
-      "inline": [
-        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
-      ]
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo rm /root/.ssh/authorized_keys",
-        "rm /home/ubuntu/.ssh/authorized_keys"
-      ]
-    },
-    {
-      "type": "file",
-      "source": "scripts",
-      "destination": "/tmp/foxpass-vpn"
-    },
-    {
-      "type": "file",
-      "source": "templates",
-      "destination": "/tmp/foxpass-vpn"
-    },
-    {
-      "type": "file",
-      "source": "foxpass-radius-agent",
-      "destination": "/tmp/foxpass-vpn"
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo apt-get -y update",
-        "sudo apt-get -y install \
-          bison \
-          fail2ban \
-          flex \
-          dnsutils \
-          gcc \
-          libcap-ng-dev \
-          libcap-ng-utils \
-          libcurl4-nss-dev \
-          libevent-dev \
-          libffi-dev \
-          libnspr4-dev \
-          libnss3-dev \
-          libnss3-tools \
-          libpam0g-dev \
-          libradius1 \
-          libselinux1-dev \
-          libssl-dev \
-          libunbound-dev \
-          make \
-          pkg-config \
-          python-pip \
-          python-pyrad \
-          wget \
-          xl2tpd",
-        "sudo apt-get -y --no-install-recommends install xmlto",
-        "sudo apt-get -y remove python-openssl",
-        "sudo pip install -r /tmp/foxpass-vpn/requirements.txt",
-        "sudo pip install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
-      ]
-    },
-    {
-      "type": "shell",
-      "inline": [
-        "sudo /tmp/foxpass-vpn/setup.sh",
-        "sudo mkdir /opt/bin",
-        "sudo mv /tmp/foxpass-vpn/templates /opt/",
-        "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
-        "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
-        "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
-        "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
-        "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
-        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
-        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/upstart/foxpass-radius-agent.conf /etc/init",
-        "sudo chmod 744 /opt/bin/config.py"
-      ]
-    }
-  ]
+ "variables":{
+   "aws_access_key":"",
+   "aws_secret_key":"",
+   "region":"us-west-2",
+   "source_ami":"ami-4c0bb02c"
+ },
+ "builders":[
+   {
+     "access_key":"{{user `aws_access_key`}}",
+     "secret_key":"{{user `aws_secret_key` }}",
+     "region":"{{user `region`}}",
+     "source_ami":"{{user `source_ami`}}",
+     "type":"amazon-ebs",
+     "instance_type":"t2.nano",
+     "ami_name":"foxpass-ipsec-vpn {{isotime \"2006-01-02 15.04\"}}",
+     "ssh_username":"ubuntu",
+     "ssh_timeout" : "15m"
+   }
+ ],
+ "provisioners":[
+   {
+     "type": "shell",
+     "inline": [
+       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+     ]
+   },
+   {
+     "type": "shell",
+     "inline": [
+       "sudo rm /root/.ssh/authorized_keys",
+       "rm /home/ubuntu/.ssh/authorized_keys"
+     ]
+   },
+   {
+     "type": "file",
+     "source": "scripts",
+     "destination": "/tmp/foxpass-vpn"
+   },
+   {
+     "type": "file",
+     "source": "templates",
+     "destination": "/tmp/foxpass-vpn"
+   },
+   {
+     "type": "file",
+     "source": "foxpass-radius-agent",
+     "destination": "/tmp/foxpass-vpn"
+   },
+   {
+     "type": "shell",
+     "inline": [
+       "sudo apt-get -y update",
+       "sudo apt-get -y install bison fail2ban flex dnsutils gcc libcap-ng-dev libcap-ng-utils libcurl4-nss-dev libevent-dev libffi-dev libnspr4-dev libnss3-dev libnss3-tools libpam0g-dev libradius1 libselinux1-dev libssl-dev libunbound-dev make pkg-config python-pip python-pyrad wget xl2tpd",
+       "sudo apt-get -y --no-install-recommends install xmlto",
+       "sudo apt-get -y remove python-openssl",
+       "sudo pip install -r /tmp/foxpass-vpn/requirements.txt",
+       "sudo pip install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
+     ]
+   },
+   {
+     "type": "shell",
+     "inline": [
+       "sudo /tmp/foxpass-vpn/setup.sh",
+       "sudo mkdir /opt/bin",
+       "sudo mv /tmp/foxpass-vpn/templates /opt/",
+       "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
+       "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
+       "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
+       "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
+       "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
+       "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
+       "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/upstart/foxpass-radius-agent.conf /etc/init",
+       "sudo chmod 744 /opt/bin/config.py"
+     ]
+   }
+ ]
 }

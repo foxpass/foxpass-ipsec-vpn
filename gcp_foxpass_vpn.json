@@ -42,8 +42,11 @@
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "sudo apt-get -y install wget dnsutils libnss3-dev libnspr4-dev pkg-config libpam0g-dev libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison gcc make libunbound-dev libnss3-tools libevent-dev libfreeradius-client2 xl2tpd fail2ban python-pyrad python-pip",
+        "sudo apt-get -y install bison fail2ban flex dnsutils gcc libcap-ng-dev libcap-ng-utils libcurl4-nss-dev libevent-dev libffi-dev libnspr4-dev libnss3-dev libnss3-tools libpam0g-dev libradius1 libselinux1-dev libssl-dev libunbound-dev make ntp pkg-config python-dev python-pyrad wget xl2tpd",
+        "wget https://bootstrap.pypa.io/get-pip.py",
+        "sudo python get-pip.py",
         "sudo apt-get -y --no-install-recommends install xmlto",
+        "sudo apt-get -y remove python-openssl",
         "sudo pip install -r /tmp/foxpass-vpn/requirements.txt",
         "sudo pip install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
       ]
@@ -61,6 +64,7 @@
         "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
         "sudo mv /tmp/foxpass-vpn/radius/agent.py /opt/bin",
         "sudo mv /tmp/foxpass-vpn/radius/upstart/foxpass-radius-agent.conf /etc/init",
+        "sudo mv /tmp/foxpass-vpn/radiusclient.conf /etc/radiusclient"
         "sudo chmod 755 /opt/bin/config.py"
       ]
     }

@@ -24,6 +24,10 @@ echo > /var/tmp/libreswan-nss-pwd
 /usr/bin/certutil -N -f /var/tmp/libreswan-nss-pwd -d /etc/ipsec.d
 /bin/rm -f /var/tmp/libreswan-nss-pwd
 
+# install libreswan into systemd
+systemctl enable ipsec.service
+systemctl start ipsec.service
+
 touch /etc/ipsec.conf
 touch /etc/iptables.rules
 touch /etc/ipsec.secrets

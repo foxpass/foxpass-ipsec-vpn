@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# quit if any command fails
+set -e
+
 mkdir /opt/src
 cd /opt/src
 SWAN_VER=3.18

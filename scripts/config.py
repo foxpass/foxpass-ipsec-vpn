@@ -85,18 +85,34 @@ def random_string(len):
     arr = [system_random.choice(chars) for i in range(len)]
     return ''.join(arr)
 
-def get_duo_data():
+def get_mfa_type():
     while True:
-        duo_resp = prompt('Will you be using DUO for MFA: (y/N)', default='N')
-        if (duo_resp == 'y' or duo_resp == 'Y'):
-            host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
-            ikey = prompt("DUO integration key")
-            skey = prompt("DUO secret key")
-            return {'api_host': host, 'ikey': ikey, 'skey': skey}
+        mfa_resp = prompt('Will you be using MFA: (y/N)', default='N')
+        if (mfa_resp == 'y' or mfa_resp == 'Y'):
+            while True:
+                mfa_type = prompt('What MFA provider: (Duo/Okta/cancel)', default='cancel')
+                mfa_type = mfa_type.lower()
+                if (mfa_type == 'duo' or mfa_type == 'okta'):
+                    return mfa_type
+                elif (mfa_type == 'cancel'):
+                    return ''
+                else:
+                    print "Please enter 'Duo', 'Okta', or 'cancel'"
         elif (duo_resp == 'n' or duo_resp == 'N'):
-            return None
+            return ''
         else:
             print "Please enter 'y' or 'n'"
+
+def get_duo_data():
+    host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
+    ikey = prompt("DUO integration key")
+    skey = prompt("DUO secret key")
+    return {'api_host': host, 'ikey': ikey, 'skey': skey}
+
+def get_okta_data():
+    hostname = prompt("OKTA api hostname, e.g. XXXXXXXX.okta.com")
+    apikey = prompt("OKTA api key")
+    return {'hostname': hostname, 'apikey': apikey}
 
 def is_gce():
     try:
@@ -116,9 +132,11 @@ def gather_user_data_prompt():
     data['dns_secondary'] = check_ip('Secondary DNS', '8.8.4.4')
     data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
 
-    duo_config = get_duo_data()
-    if duo_config:
-        data['duo_config'] = duo_config
+    mfa_type = get_mfa_type()
+    if mfa_type == 'duo':
+        data['duo_config'] = get_duo_data()
+    elif mfa_type == 'okta':
+        data['okta_config'] = get_okta_data()
 
     data['foxpass_api_key'] = prompt('Foxpass API Key')
 
@@ -206,8 +224,8 @@ def config_vpn(data):
         duo_skey = data['duo_config'].get('skey')
 
     if 'okta_config' in data:
-        okta_hostname = data['okta_config'].get('okta_hostname')
-        okta_apikey = data['okta_config'].get('okta_apikey')
+        okta_hostname = data['okta_config'].get('hostname')
+        okta_apikey = data['okta_config'].get('apikey')
 
     local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
     local_ip = IpRange(data['local_cidr'])[1]

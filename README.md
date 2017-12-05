@@ -58,7 +58,7 @@ for Google Cloud Platform :
     "foxpass_api_key": "PUT_YOUR_FOXPASS_API_KEY_HERE",
     "mfa_type": "DUO_OR_OKTA",
     "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"},
-    "okta_config": {"okta_hostname": "OKTA_HOSTNAME", "okta_apikey": "OKTA_APIKEY", "ikey": "IKEY_FROM_DUO"},
+    "okta_config": {"hostname": "OKTA_HOSTNAME", "apikey": "OKTA_APIKEY"},
     "require_groups": ["group_1", "group_2"]
    }
    ```

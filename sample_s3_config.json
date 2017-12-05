@@ -6,5 +6,5 @@
  "require_groups" : ["group_1", "group_2"],
  "mfa_type": "duo_or_okta",
  "duo_config": {"api_host": "api.host", "skey": "skey!", "ikey": "ikey!"},
- "okta_config": {"okta_hostname": "okta_hostname", "okta_apikey": "okta_apikey"},
+ "okta_config": {"hostname": "hostname", "apikey": "apikey"},
 }

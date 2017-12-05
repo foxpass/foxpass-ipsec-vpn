@@ -90,14 +90,14 @@ def get_mfa_type():
         mfa_resp = prompt('Will you be using MFA: (y/N)', default='N')
         if (mfa_resp == 'y' or mfa_resp == 'Y'):
             while True:
-                mfa_type = prompt('What MFA provider: (Duo/Okta/cancel)', default='cancel')
+                mfa_type = prompt('What MFA provider: (duo/okta/Cancel)', default='Cancel')
                 mfa_type = mfa_type.lower()
                 if (mfa_type == 'duo' or mfa_type == 'okta'):
                     return mfa_type
                 elif (mfa_type == 'cancel'):
                     return ''
                 else:
-                    print "Please enter 'Duo', 'Okta', or 'cancel'"
+                    print "Please enter 'duo', 'okta', or 'Cancel'"
         elif (mfa_resp == 'n' or mfa_resp == 'N'):
             return ''
         else:

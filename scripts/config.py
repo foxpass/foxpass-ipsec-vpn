@@ -98,7 +98,7 @@ def get_mfa_type():
                     return ''
                 else:
                     print "Please enter 'Duo', 'Okta', or 'cancel'"
-        elif (duo_resp == 'n' or duo_resp == 'N'):
+        elif (mfa_resp == 'n' or mfa_resp == 'N'):
             return ''
         else:
             print "Please enter 'y' or 'n'"
@@ -241,7 +241,7 @@ def config_vpn(data):
                '<RADIUS_SECRET>': data['radius_secret'],
                '<API_KEY>': data['foxpass_api_key'],
                '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',
-               '<MFA_TYPE>', mfa_type
+               '<MFA_TYPE>': mfa_type,
                '<DUO_API_HOST>': duo_api_host,
                '<DUO_IKEY>': duo_ikey,
                '<DUO_SKEY>': duo_skey,

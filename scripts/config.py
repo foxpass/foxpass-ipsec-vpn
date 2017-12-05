@@ -188,14 +188,26 @@ def modify_etc_hosts(data):
 
 def config_vpn(data):
 
+    mfa_type = ''
+
     duo_api_host = ''
     duo_ikey = ''
     duo_skey = ''
+
+    okta_hostname = ''
+    okta_apikey = ''
+
+    if 'mfa_type' in data:
+        mfa_type = data['mfa_type']
 
     if 'duo_config' in data:
         duo_api_host = data['duo_config'].get('api_host')
         duo_ikey = data['duo_config'].get('ikey')
         duo_skey = data['duo_config'].get('skey')
+
+    if 'okta_config' in data:
+        okta_hostname = data['okta_config'].get('okta_hostname')
+        okta_apikey = data['okta_config'].get('okta_apikey')
 
     local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
     local_ip = IpRange(data['local_cidr'])[1]
@@ -211,9 +223,12 @@ def config_vpn(data):
                '<RADIUS_SECRET>': data['radius_secret'],
                '<API_KEY>': data['foxpass_api_key'],
                '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',
+               '<MFA_TYPE>', mfa_type
                '<DUO_API_HOST>': duo_api_host,
                '<DUO_IKEY>': duo_ikey,
                '<DUO_SKEY>': duo_skey,
+               '<OKTA_HOSTNAME>': okta_hostname,
+               '<OKTA_APIKEY>': okta_apikey
               }
 
     file_list = {'ipsec.secrets': '/etc/',

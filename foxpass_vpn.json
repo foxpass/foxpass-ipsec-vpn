@@ -3,7 +3,7 @@
     "aws_access_key":"",
     "aws_secret_key":"",
     "region":"us-west-2",
-    "source_ami":"ami-4c0bb02c"
+    "source_ami":"ami-0def3275"
   },
   "builders":[
     {
@@ -33,6 +33,12 @@
       ]
     },
     {
+      "type": "shell",
+      "inline": [
+        "mkdir /tmp/foxpass-vpn"
+      ]
+    },
+    {
       "type": "file",
       "source": "scripts",
       "destination": "/tmp/foxpass-vpn"
@@ -50,13 +56,13 @@
     {
       "type": "file",
       "source": "requirements.txt",
-      "destination": "/tmp/foxpass-vpn/"
+      "destination": "/tmp/foxpass-vpn/requirements.txt"
     },
     {
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "sudo apt-get -y install bison fail2ban flex dnsutils gcc libcap-ng-dev libcap-ng-utils libcurl4-nss-dev libevent-dev libffi-dev libnspr4-dev libnss3-dev libnss3-tools libpam0g-dev libradius1 libselinux1-dev libssl-dev libunbound-dev make ntp pkg-config python-dev python-pyrad wget xl2tpd",
+        "sudo apt-get -y install bison fail2ban flex dnsutils gcc libcap-ng-dev libcap-ng-utils libcurl4-nss-dev libevent-dev libffi-dev libfreeradius-client2 libnspr4-dev libnss3-dev libnss3-tools libpam0g-dev libselinux1-dev libssl-dev libsystemd-dev libunbound-dev make ntp pkg-config python-dev wget xl2tpd",
         "wget https://bootstrap.pypa.io/get-pip.py",
         "sudo python get-pip.py",
         "sudo apt-get -y --no-install-recommends install xmlto",
@@ -67,17 +73,17 @@
     },    {
       "type": "shell",
       "inline": [
-        "sudo /tmp/foxpass-vpn/setup.sh",
+        "sudo /tmp/foxpass-vpn/scripts/setup.sh",
         "sudo mkdir /opt/bin",
         "sudo mv /tmp/foxpass-vpn/templates /opt/",
-        "sudo mv /tmp/foxpass-vpn/config.py /opt/bin/config.py",
-        "sudo mv /tmp/foxpass-vpn/rc.local /etc/rc.local",
-        "sudo mv /tmp/foxpass-vpn/sshd_config /etc/ssh/sshd_config",
-        "sudo mv /tmp/foxpass-vpn/sysctl.conf /etc/sysctl.conf",
-        "sudo mv /tmp/foxpass-vpn/iptablesload /etc/network/if-pre-up.d/iptablesload",
+        "sudo mv /tmp/foxpass-vpn/scripts/config.py /opt/bin/config.py",
+        "sudo mv /tmp/foxpass-vpn/scripts/sshd_config /etc/ssh/sshd_config",
+        "sudo mv /tmp/foxpass-vpn/scripts/sysctl.conf /etc/sysctl.conf",
+        "sudo mv /tmp/foxpass-vpn/scripts/iptablesload /etc/network/if-pre-up.d/iptablesload",
+        "sudo mv /tmp/foxpass-vpn/scripts/radiusclient.conf /etc/radiusclient",
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
-        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/upstart/foxpass-radius-agent.conf /etc/init",
-        "sudo mv /tmp/foxpass-vpn/radiusclient.conf /etc/radiusclient",
+        "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.service /lib/systemd/system/",
+        "sudo systemctl enable foxpass-radius-agent.service",
         "sudo chmod 744 /opt/bin/config.py"
       ]
     }

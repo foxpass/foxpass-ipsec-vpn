@@ -133,6 +133,7 @@ def gather_user_data_prompt():
     data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
 
     mfa_type = get_mfa_type()
+    data['mfa_type'] = mfa_type
     if mfa_type == 'duo':
         data['duo_config'] = get_duo_data()
     elif mfa_type == 'okta':

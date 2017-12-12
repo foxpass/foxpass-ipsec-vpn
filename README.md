@@ -47,7 +47,7 @@ for Google Cloud Platform :
    ```
 
   * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3.
-  * Upload the config file with the following format (duo_config is optional):
+  * Upload the config file with the following format (mfa_type, duo_config, and okta_config are optional):
 
    ```
    {

@@ -38,15 +38,16 @@ for Google Cloud Platform :
   sudo /opt/bin/config.py
   ```
 
-* To automatically pull config from S3:
-  * Set EC2 user-data to (this will run the config script on startup)
+* To automatically pull config from S3 (optional)
+  * Set EC2 user-data to
 
    ```
     #!/bin/bash
     sudo /opt/bin/config.py s3://bucket-name/path/to/config.json
    ```
+   This will run the config script on startup, you will not need to run the config script manually.
 
-  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3.
+  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3. (Only required if you choose to automatically pull your config from S3.)
   * Upload the config file with the following format (duo_config is optional):
 
    ```

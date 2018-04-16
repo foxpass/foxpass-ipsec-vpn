@@ -47,7 +47,7 @@ for Google Cloud Platform :
    ```
 
   * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3.
-  * Upload the config file with the following format (mfa_type, duo_config, and okta_config are optional):
+  * Upload the config file with the following format (mfa_type, duo_config, okta_config, and require_groups are optional):
 
    ```
    {
@@ -56,10 +56,10 @@ for Google Cloud Platform :
     "dns_secondary": "8.8.4.4",
     "local_cidr": "10.11.12.0/24",
     "foxpass_api_key": "PUT_YOUR_FOXPASS_API_KEY_HERE",
-    "mfa_type": "DUO_OR_OKTA",
+    "mfa_type": "duo_OR_okta",
     "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"},
     "okta_config": {"hostname": "OKTA_HOSTNAME", "apikey": "OKTA_APIKEY"},
-    "require_groups": ["group_1", "group_2"]
+    "require_groups": ["group_1", "group_2", "etc. <- optionally requires user to be a member of one of the listed groups"]
    }
    ```
 

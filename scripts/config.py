@@ -72,7 +72,7 @@ def check_cidr(target, default=None):
                 print "%s is too small, use a larger network size." % cidr
             else:
                 return cidr
-        except:
+        except Exception:
             pass
 
 

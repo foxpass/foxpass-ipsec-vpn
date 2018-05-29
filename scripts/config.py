@@ -89,6 +89,7 @@ def random_string(len):
     arr = [system_random.choice(chars) for i in range(len)]
     return ''.join(arr)
 
+
 def get_mfa_type():
     while True:
         mfa_resp = prompt('Will you be using MFA: (y/N)', default='N')
@@ -107,16 +108,19 @@ def get_mfa_type():
         else:
             print "Please enter 'y' or 'n'"
 
+
 def get_duo_data():
     host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
     ikey = prompt("DUO integration key")
     skey = prompt("DUO secret key")
     return {'api_host': host, 'ikey': ikey, 'skey': skey}
 
+
 def get_okta_data():
     hostname = prompt("OKTA api hostname, e.g. XXXXXXXX.okta.com")
     apikey = prompt("OKTA api key")
     return {'hostname': hostname, 'apikey': apikey}
+
 
 def is_gce():
     try:
@@ -215,6 +219,7 @@ def modify_etc_hosts(data):
     hosts.write()
 
 
+def config_vpn(data):
     mfa_type = ''
 
     duo_api_host = ''
@@ -236,7 +241,7 @@ def modify_etc_hosts(data):
         okta_hostname = data['okta_config'].get('hostname')
         okta_apikey = data['okta_config'].get('apikey')
 
-    local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
+    local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr'])) - 5]
     local_ip = IpRange(data['local_cidr'])[1]
     holders = {'<PSK>': data['psk'],
                '<DNS_PRIMARY>': data['dns_primary'],

@@ -3,6 +3,8 @@
  "dns_secondary": "8.8.4.4",
  "local_cidr": "10.11.12.0/24",
  "foxpass_api_key": "abcdefg",
- "require_groups" : ["group_1", "group_2"],
- "duo_config": {"api_host": "api.host", "skey": "skey!", "ikey": "ikey!"}
+ "require_groups" : ["group_1", "group_2", "<- optionally requires user to be a member of one of the listed groups"],
+ "mfa_type": "duo_or_okta <- mfa_type, duo_config, and okta_config are optional",
+ "duo_config": {"api_host": "api.host", "skey": "skey!", "ikey": "ikey!"},
+ "okta_config": {"hostname": "hostname", "apikey": "apikey"},
 }

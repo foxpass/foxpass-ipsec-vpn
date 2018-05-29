@@ -1,6 +1,6 @@
 ### What it does
 
-This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) for two-factor authentication (HIGHLY RECOMMENDED).
+This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) or [Okta](https://www.okta.com) for two-factor authentication (HIGHLY RECOMMENDED). NOTE: If you use emails for your Duo requests instead of usernames, you must enable username normalization. You can find more info about that setting [here](https://duo.com/docs/creating_applications#username-normalization).
 
 Note that you don't have to build it. We have ready-to-go, free-of-charge AMIs on the [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01HMLVKPS).
 
@@ -12,7 +12,7 @@ Note that you don't have to build it. We have ready-to-go, free-of-charge AMIs o
   * `git submodule update`
 * Download and install Hashicorp's Packer (http://packer.io)
 * Put your AWS access key and secret key someplace that Packer [can find them](https://www.packer.io/docs/builders/amazon.html#specifying-amazon-credentials).
-* set your region and base AMI (currently designed for Ubuntu 14.04 base images) in foxpass_vpn.json
+* set your region and base AMI (currently designed for Ubuntu 16.04 base images) in foxpass_vpn.json
 * run `packer build foxpass_vpn.json`
 
 for Google Cloud Platform :
@@ -48,7 +48,7 @@ for Google Cloud Platform :
    This will run the config script on startup, you will not need to run the config script manually.
 
   * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3. (Only required if you choose to automatically pull your config from S3.)
-  * Upload the config file with the following format (duo_config is optional):
+  * Upload the config file with the following format (mfa_type, duo_config, okta_config, and require_groups are optional):
 
    ```
    {
@@ -57,8 +57,10 @@ for Google Cloud Platform :
     "dns_secondary": "8.8.4.4",
     "local_cidr": "10.11.12.0/24",
     "foxpass_api_key": "PUT_YOUR_FOXPASS_API_KEY_HERE",
+    "mfa_type": "duo_OR_okta",
     "duo_config": {"api_host": "API_HOST_FROM_DUO", "skey": "SKEY_FROM_DUO", "ikey": "IKEY_FROM_DUO"},
-    "require_groups": ["group_1", "group_2"]
+    "okta_config": {"hostname": "OKTA_HOSTNAME", "apikey": "OKTA_APIKEY"},
+    "require_groups": ["group_1", "group_2"] <- optionally requires user to be a member of one of the listed groups
    }
    ```
 

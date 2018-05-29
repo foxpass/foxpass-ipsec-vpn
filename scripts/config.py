@@ -48,6 +48,7 @@ if geteuid() != 0:
 
 METADATA_BASE_URL = "http://169.254.169.254/"
 
+
 def check_ip(target, default=None):
     while True:
         try:
@@ -57,6 +58,7 @@ def check_ip(target, default=None):
             print "%s is not a valid IP." % ip
         else:
             return ip
+
 
 def check_cidr(target, default=None):
     while True:
@@ -70,20 +72,23 @@ def check_cidr(target, default=None):
                 print "%s is too small, use a larger network size." % cidr
             else:
                 return cidr
-        except:
+        except Exception:
             pass
+
 
 def prompt(message, default=None):
     if default:
-        return raw_input( '%s [%s]: ' % (message, default) ) or default
+        return raw_input('%s [%s]: ' % (message, default)) or default
     else:
-        return raw_input( '%s: ' % (message) )
+        return raw_input('%s: ' % (message))
+
 
 def random_string(len):
     system_random = random.SystemRandom()
     chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
     arr = [system_random.choice(chars) for i in range(len)]
     return ''.join(arr)
+
 
 def get_duo_data():
     while True:
@@ -98,6 +103,7 @@ def get_duo_data():
         else:
             print "Please enter 'y' or 'n'"
 
+
 def is_gce():
     try:
         response = urlopen(METADATA_BASE_URL)
@@ -108,12 +114,13 @@ def is_gce():
     except Exception:
         return False
 
+
 def gather_user_data_prompt():
     data = {}
 
     data['psk'] = prompt('Enter PSK', default=random_string(32))
-    data['dns_primary'] = check_ip('Primary DNS', '8.8.8.8')
-    data['dns_secondary'] = check_ip('Secondary DNS', '8.8.4.4')
+    data['dns_primary'] = check_ip('Primary DNS', '1.1.1.1')
+    data['dns_secondary'] = check_ip('Secondary DNS', '1.0.0.1')
     data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
 
     duo_config = get_duo_data()
@@ -128,6 +135,7 @@ def gather_user_data_prompt():
         data['require_groups'] = require_groups.split(',')
 
     return data
+
 
 def gather_user_data_s3(s3_url):
     import boto
@@ -153,8 +161,10 @@ def gather_user_data_s3(s3_url):
     data = key.get_contents_as_string()
     return json.loads(data)
 
+
 def gather_user_data_file(filename):
     return json.load(file(filename))
+
 
 def get_machine_data():
     data = {}
@@ -175,6 +185,7 @@ def get_machine_data():
 
     return data
 
+
 def modify_etc_hosts(data):
     private_ip = data['private_ip']
     hostname = socket.gethostname()
@@ -186,20 +197,19 @@ def modify_etc_hosts(data):
     hosts.add([new_entry])
     hosts.write()
 
-def config_vpn(data):
 
+def config_vpn(data):
     duo_api_host = ''
     duo_ikey = ''
     duo_skey = ''
-
     if 'duo_config' in data:
         duo_api_host = data['duo_config'].get('api_host')
         duo_ikey = data['duo_config'].get('ikey')
         duo_skey = data['duo_config'].get('skey')
 
-    local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr']))-5]
+    local_ip_range = IpRange(data['local_cidr'])[10] + '-'
+    + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr'])) - 5]
     local_ip = IpRange(data['local_cidr'])[1]
-
     holders = {'<PSK>': data['psk'],
                '<DNS_PRIMARY>': data['dns_primary'],
                '<DNS_SECONDARY>': data['dns_secondary'],
@@ -214,47 +224,46 @@ def config_vpn(data):
                '<DUO_API_HOST>': duo_api_host,
                '<DUO_IKEY>': duo_ikey,
                '<DUO_SKEY>': duo_skey,
-              }
-
+               }
     file_list = {'ipsec.secrets': '/etc/',
                  'iptables.rules': '/etc/',
                  'options.xl2tpd': '/etc/ppp/',
                  'xl2tpd.conf': '/etc/xl2tpd/',
-                 'ipsec.conf':'/etc/',
+                 'ipsec.conf': '/etc/',
                  'foxpass-radius-agent.conf': '/etc/',
                  'servers': '/etc/radiusclient/'}
-
 
     templates = '/opt/templates'
     files = {}
     for file in file_list.iterkeys():
-        path = '%s/%s' % (templates,file)
-        files[file] = open(path,'r').read()
-    for file,source in files.iteritems():
-        dest = open(file_list[file]+file,'w')
-        for orig,repl in holders.iteritems():
-            source = source.replace(orig,repl)
+        path = '%s/%s' % (templates, file)
+        files[file] = open(path, 'r').read()
+    for file, source in files.iteritems():
+        dest = open(file_list[file] + file, 'w')
+        for orig, repl in holders.iteritems():
+            source = source.replace(orig, repl)
         dest.write(source)
         dest.close()
-    commands = ['xl2tpd','ipsec','fail2ban', 'foxpass-radius-agent']
-    call(['/sbin/sysctl','-p'])
+    commands = ['xl2tpd', 'ipsec', 'fail2ban', 'foxpass-radius-agent']
+    call(['/sbin/sysctl', '-p'])
     # set /etc/ipsec.secrets to be owned and only accessible by root
     # chmod 0600 is r/w owner
     # chown 0 is set user to root
-    chmod('/etc/ipsec.secrets',0600)
-    chown('/etc/ipsec.secrets',0,0)
+    chmod('/etc/ipsec.secrets', 0600)
+    chown('/etc/ipsec.secrets', 0, 0)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
     for command in commands:
-        call(['service',command,'stop'], shell=False)
-        call(['service',command,'start'], shell=False)
+        call(['service', command, 'stop'], shell=False)
+        call(['service', command, 'start'], shell=False)
+
 
 def main():
     # only allowed argument is pointer to json file on-disk or in s3
     if len(sys.argv) > 1:
         if sys.argv[1].startswith('s3:'):
-           data = gather_user_data_s3(sys.argv[1])
+            data = gather_user_data_s3(sys.argv[1])
         else:
-           data = gather_user_data_file(sys.argv[1])
+            data = gather_user_data_file(sys.argv[1])
     else:
         data = gather_user_data_prompt()
 

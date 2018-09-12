@@ -47,7 +47,7 @@ for Google Cloud Platform :
    ```
    This will run the config script on startup, you will not need to run the config script manually.
 
-  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions to the above-mentioned bucket and path in S3. (Only required if you choose to automatically pull your config from S3.)
+  * Set EC2 role to a role in IAM that has `ListBucket` and `GetObject` permissions (`GetObjectVersion`, too, if your bucket has versioning enabled) to the above-mentioned bucket and path in S3. (Only required if you choose to automatically pull your config from S3.)
   * Upload the config file with the following format (mfa_type, duo_config, okta_config, and require_groups are optional):
 
    ```

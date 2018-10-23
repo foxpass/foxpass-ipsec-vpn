@@ -1,6 +1,6 @@
 ### What it does
 
-This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) or [Okta](https://www.okta.com) for two-factor authentication (HIGHLY RECOMMENDED). NOTE: If you use emails for your Duo requests instead of usernames, you must enable username normalization. You can find more info about that setting [here](https://duo.com/docs/creating_applications#username-normalization).
+This repo helps you create an AMI image that offers a simple IPSEC/L2TP VPN server. Username and password will be checked against [Foxpass](https://www.foxpass.com) (which in-turn syncs with Google Apps) and optionally against [Duo](https://www.duo.com) or [Okta](https://www.okta.com) for two-factor authentication (HIGHLY RECOMMENDED). NOTE: If you use emails for your Duo requests instead of usernames, you must enable username normalization. You can find more info about that setting [here](https://duo.com/docs/creating_applications#username-normalization). If you use Okta instead, Foxpass requires credentials with at least [Group Admin](https://help.okta.com/en/prod/Content/Topics/Security/The_User_Admin_Role.htm?Highlight=group%20admin) privileges in order to check the 2FA API endpoint with Okta.
 
 Note that you don't have to build it. We have ready-to-go, free-of-charge AMIs on the [AWS Marketplace](https://aws.amazon.com/marketplace/pp/B01HMLVKPS).
 

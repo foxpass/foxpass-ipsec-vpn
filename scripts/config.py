@@ -38,6 +38,7 @@ from urllib2 import urlopen, Request
 from urlparse import urlparse
 
 # third party libs
+import ifaddr
 from iptools import IpRange
 from iptools.ipv4 import validate_cidr
 from python_hosts import Hosts, HostsEntry

@@ -193,6 +193,7 @@ def get_machine_data():
     data['radius_secret'] = random_string(16)
 
     data['is_gce'] = is_gce()
+
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
         request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip', headers=headers)

@@ -189,7 +189,9 @@ def gather_user_data_file(filename):
 
 def get_machine_data():
     data = {}
+
     data['radius_secret'] = random_string(16)
+
     data['is_gce'] = is_gce()
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
@@ -200,7 +202,9 @@ def get_machine_data():
     else:
         data['public_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
         data['private_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
+
     data['interface'] = get_adapter(data['private_ip'])
+
     return data
 
 

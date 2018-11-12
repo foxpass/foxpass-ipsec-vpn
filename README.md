@@ -67,6 +67,7 @@ for Google Cloud Platform :
 ### How to set up your clients
 
 * [Mac OSX](https://foxpass.readme.io/docs/foxpass-ipsec-vpn-macosx)
+* [Windows](https://foxpass.readme.io/docs/foxpass-windows-8-l2tpipsec-setup)
 
 ### How to make changes
 

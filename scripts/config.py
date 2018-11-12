@@ -189,11 +189,8 @@ def gather_user_data_file(filename):
 
 def get_machine_data():
     data = {}
-
     data['radius_secret'] = random_string(16)
-
     data['is_gce'] = is_gce()
-
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
         request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip', headers=headers)
@@ -203,8 +200,16 @@ def get_machine_data():
     else:
         data['public_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
         data['private_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
-
+    data['interface'] = get_adapter(data['private_ip'])
     return data
+
+
+def get_adapter(private_ip):
+    adapters = ifaddr.get_adapters()
+    for adapter in adapters:
+        for ip in adapter.ips:
+            if ip.ip == private_ip:
+                return adapter.nice_name
 
 
 def modify_etc_hosts(data):
@@ -251,6 +256,7 @@ def config_vpn(data):
                '<LOCAL_SUBNET>': data['local_cidr'],
                '<PUBLIC_IP>': data['public_ip'],
                '<PRIVATE_IP>': data['private_ip'],
+               '<INTERFACE>': data['interface'],
                '<RADIUS_SECRET>': data['radius_secret'],
                '<API_KEY>': data['foxpass_api_key'],
                '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',

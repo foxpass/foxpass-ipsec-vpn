@@ -15,8 +15,8 @@
 -A INPUT -p udp --dport 1701 -j DROP
 -A INPUT -j DROP
 -A FORWARD -m conntrack --ctstate INVALID -j DROP
--A FORWARD -i eth+ -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
--A FORWARD -i ppp+ -o eth+ -j ACCEPT
+-A FORWARD -i <INTERFACE> -o ppp+ -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+-A FORWARD -i ppp+ -o <INTERFACE> -j ACCEPT
 # If you wish to allow traffic between VPN clients themselves, uncomment this line:
 # -A FORWARD -i ppp+ -o ppp+ -s <LOCAL_SUBNET> -d <LOCAL_SUBNET> -j ACCEPT
 -A FORWARD -j DROP
@@ -33,5 +33,5 @@ COMMIT
 :INPUT ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
 :POSTROUTING ACCEPT [0:0]
--A POSTROUTING -s <LOCAL_SUBNET> -o eth+ -j SNAT --to-source "<PRIVATE_IP>"
+-A POSTROUTING -s <LOCAL_SUBNET> -o <INTERFACE> -j SNAT --to-source "<PRIVATE_IP>"
 COMMIT

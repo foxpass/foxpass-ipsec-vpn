@@ -38,6 +38,7 @@ from urllib2 import urlopen, Request
 from urlparse import urlparse
 
 # third party libs
+import ifaddr
 from iptools import IpRange
 from iptools.ipv4 import validate_cidr
 from python_hosts import Hosts, HostsEntry
@@ -204,7 +205,17 @@ def get_machine_data():
         data['public_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
         data['private_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
 
+    data['interface'] = get_adapter(data['private_ip'])
+
     return data
+
+
+def get_adapter(private_ip):
+    adapters = ifaddr.get_adapters()
+    for adapter in adapters:
+        for ip in adapter.ips:
+            if ip.ip == private_ip:
+                return adapter.nice_name
 
 
 def modify_etc_hosts(data):
@@ -251,6 +262,7 @@ def config_vpn(data):
                '<LOCAL_SUBNET>': data['local_cidr'],
                '<PUBLIC_IP>': data['public_ip'],
                '<PRIVATE_IP>': data['private_ip'],
+               '<INTERFACE>': data['interface'],
                '<RADIUS_SECRET>': data['radius_secret'],
                '<API_KEY>': data['foxpass_api_key'],
                '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',

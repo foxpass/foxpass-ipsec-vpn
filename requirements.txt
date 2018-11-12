@@ -1,4 +1,5 @@
 boto==2.45.0
+ifaddr==0.1.4
 iptools==0.6.1
 ndg-httpsclient==0.4.2
 pyasn1==0.2.2

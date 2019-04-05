@@ -25,10 +25,15 @@ for Google Cloud Platform :
 
 * Instantiate an image with the resulting AMI
   * Make sure it has a public IP address
-  * Make sure it is in a security group with the following inbound rules:
+  * Make sure it is in a security group with at least the following inbound rules:
     * UDP 500
     * UDP 4500
     * TCP 22 to your IP (for SSH management)
+  * Make sure it is in a security group with at least the following outbound rules:
+    * UDP 500
+    * UDP 4500
+    * TCP 1024-65535 to your IP (for SSH management)
+    * (optional) Any target ports you want to allow for access
   * (optional, see below) for AWS: setup script can pull config from S3. Set role and user-data as described below.
 
 * When the instance comes up

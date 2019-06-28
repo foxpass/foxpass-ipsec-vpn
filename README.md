@@ -29,6 +29,7 @@ for Google Cloud Platform :
     * UDP 500
     * UDP 4500
     * TCP 22 to your IP (for SSH management)
+    * ESP  * (protocol=50) for IPSEC handshake
   * (optional, see below) for AWS: setup script can pull config from S3. Set role and user-data as described below.
 
 * When the instance comes up

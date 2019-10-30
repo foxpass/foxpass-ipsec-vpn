@@ -160,8 +160,7 @@ def gather_user_data_prompt():
 
 
 def gather_user_data_s3(s3_url):
-    import boto
-    from boto.s3.connection import S3Connection
+    import boto3
 
     parts = urlparse(s3_url)
 
@@ -169,18 +168,12 @@ def gather_user_data_s3(s3_url):
         raise Exception("Must use s3 url scheme")
 
     bucket_name = parts.netloc
-    path = parts.path
+    path = parts.path.lstrip('/')
 
-    conn = boto.connect_s3()
-    bucket = conn.get_bucket(bucket_name)
-    if not bucket:
-        raise Exception("Can't find bucket '%s'" % bucket_name)
+    s3 = boto3.resource('s3')
+    obj = s3.Object(bucket_name, path)
+    data = obj.get()['Body'].read().decode('utf-8')
 
-    key = bucket.get_key(path)
-    if not key:
-        raise Exception("Can't find file '%s'" % path)
-
-    data = key.get_contents_as_string()
     return json.loads(data)
 
 

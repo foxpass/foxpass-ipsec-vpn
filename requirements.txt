@@ -1,7 +1,7 @@
-boto3==1.9.204
-ifaddr==0.1.4
-iptools==0.6.1
-ndg-httpsclient==0.4.2
-pyasn1==0.2.2
-python-hosts==0.3.7
-pyOpenSSL==17.5.0
+boto3
+ifaddr
+iptools
+ndg-httpsclient
+pyasn1
+python-hosts
+pyOpenSSL

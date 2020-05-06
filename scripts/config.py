@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # Copyright (c) 2015-present, Foxpass, Inc.
 # All rights reserved.
@@ -27,6 +27,7 @@
 # system libs
 import json
 import random
+import requests
 import socket
 import string
 import sys
@@ -34,8 +35,7 @@ from os import chown, chmod, geteuid, urandom
 from re import match
 from shutil import copyfile
 from subprocess import call
-from urllib2 import urlopen, Request
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 # third party libs
 import ifaddr
@@ -53,10 +53,10 @@ METADATA_BASE_URL = "http://169.254.169.254/"
 def check_ip(target, default=None):
     while True:
         try:
-            ip = prompt("Enter %s: " % target, default)
+            ip = prompt('Enter {}: '.format(target), default)
             str(IpRange(ip))
         except TypeError:
-            print "%s is not a valid IP." % ip
+            print('{} is not a valid IP.'.format(ip))
         else:
             return ip
 
@@ -64,13 +64,13 @@ def check_ip(target, default=None):
 def check_cidr(target, default=None):
     while True:
         try:
-            cidr = prompt("Enter %s: " % target, default)
+            cidr = prompt('Enter {}: '.format(target), default)
             if validate_cidr(cidr):
                 pass
             else:
-                print "%s is not a valid CIDR." % cidr
+                print '{} is not a valid CIDR.'.format(cidr)
             if int(cidr.split('/')[1]) > 27:
-                print "%s is too small, use a larger network size." % cidr
+                print('{} is too small, use a larger network size.'.format(cidr))
             else:
                 return cidr
         except Exception:
@@ -79,9 +79,9 @@ def check_cidr(target, default=None):
 
 def prompt(message, default=None):
     if default:
-        return raw_input('%s [%s]: ' % (message, default)) or default
+        return input('{} [{}]: '.format(message, default)) or default
     else:
-        return raw_input('%s: ' % (message))
+        return input('{}: '.format(message))
 
 
 def random_string(len):
@@ -93,17 +93,17 @@ def random_string(len):
 
 def get_mfa_type():
     while True:
-        mfa_resp = prompt('Will you be using MFA: (y/N)', default='N')
+        mfa_resp = prompt('Will you be using MFA: (y/N) ', default='N')
         if (mfa_resp == 'y' or mfa_resp == 'Y'):
             while True:
-                mfa_type = prompt('What MFA provider: (duo/okta/Cancel)', default='Cancel')
+                mfa_type = prompt('What MFA provider: (duo/okta/Cancel) ', default='Cancel')
                 mfa_type = mfa_type.lower()
                 if (mfa_type == 'duo' or mfa_type == 'okta'):
                     return mfa_type
                 elif (mfa_type == 'cancel'):
                     return ''
                 else:
-                    print "Please enter 'duo', 'okta', or 'Cancel'"
+                    print('Please enter `duo`, `okta`, or `Cancel`')
         elif (mfa_resp == 'n' or mfa_resp == 'N'):
             return ''
         else:
@@ -111,23 +111,23 @@ def get_mfa_type():
 
 
 def get_duo_data():
-    host = prompt("DUO api host, e.g. api-XXXXXXXX.duosecurity.com")
-    ikey = prompt("DUO integration key")
-    skey = prompt("DUO secret key")
+    host = prompt('DUO api host, e.g. api-XXXXXXXX.duosecurity.com')
+    ikey = prompt('DUO integration key')
+    skey = prompt('DUO secret key')
     return {'api_host': host, 'ikey': ikey, 'skey': skey}
 
 
 def get_okta_data():
-    hostname = prompt("OKTA api hostname, e.g. XXXXXXXX.okta.com")
-    apikey = prompt("OKTA api key")
+    hostname = prompt('OKTA api hostname, e.g. XXXXXXXX.okta.com')
+    apikey = prompt('OKTA api key')
     return {'hostname': hostname, 'apikey': apikey}
 
 
 def is_gce():
     try:
-        response = urlopen(METADATA_BASE_URL)
+        response = requests.get(METADATA_BASE_URL)
         try:
-            return response.info().get("Metadata-Flavor") == "Google"
+            return response.headers['Metadata-Flavor'] == 'Google'
         finally:
             response.close()
     except Exception:
@@ -165,7 +165,7 @@ def gather_user_data_s3(s3_url):
     parts = urlparse(s3_url)
 
     if parts.scheme != 's3':
-        raise Exception("Must use s3 url scheme")
+        raise Exception('Must use s3 url scheme')
 
     bucket_name = parts.netloc
     path = parts.path.lstrip('/')
@@ -190,13 +190,12 @@ def get_machine_data():
 
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
-        request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/access-configs/0/external-ip', headers=headers)
-        data['public_ip'] = urlopen(request).read()
-        request = Request(METADATA_BASE_URL + 'computeMetadata/v1/instance/network-interfaces/0/ip', headers=headers)
-        data['private_ip'] = urlopen(request).read()
+        gogle_path = 'computeMetadata/v1/instance/network-interfaces/0/'
+        data['public_ip'] = requests.get(METADATA_BASE_URL + google_path + 'access-configs/0/external-ip', headers=headers).text
+        data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers).text
     else:
-        data['public_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').read()
-        data['private_ip'] = urlopen(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').read()
+        data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').text
+        data['private'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').text
 
     data['interface'] = get_adapter(data['private_ip'])
 
@@ -278,7 +277,7 @@ def config_vpn(data):
     templates = '/opt/templates'
     files = {}
     for file in file_list.iterkeys():
-        path = '%s/%s' % (templates, file)
+        path = '{}/{}'.format(templates, file)
         files[file] = open(path, 'r').read()
     for file, source in files.iteritems():
         dest = open(file_list[file] + file, 'w')
@@ -288,15 +287,17 @@ def config_vpn(data):
         dest.close()
     commands = ['xl2tpd', 'ipsec', 'fail2ban', 'foxpass-radius-agent']
     call(['/sbin/sysctl', '-p'])
-    # set /etc/ipsec.secrets to be owned and only accessible by root
+    # set /etc/ipsec.secrets and foxpass-radius-agent.conf to be owned and only accessible by root
     # chmod 0600 is r/w owner
     # chown 0 is set user to root
     chmod('/etc/ipsec.secrets', 0600)
     chown('/etc/ipsec.secrets', 0, 0)
+    chmod('/etc/foxpass-radius-agent.conf', 0600)
+    chown('/etc/foxpass-radius-agent.conf', 0, 0)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
     for command in commands:
-        call(['service', command, 'stop'], shell=False)
-        call(['service', command, 'start'], shell=False)
+        call(['/usr/sbin/service', command, 'stop'], shell=False)
+        call(['/usr/sbin/service', command, 'start'], shell=False)
 
 
 def main():

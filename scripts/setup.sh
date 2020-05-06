@@ -3,7 +3,7 @@
 # quit if any command fails
 set -e
 
-mkdir /opt/src
+mkdir -p /opt/src
 cd /opt/src
 SWAN_VER=3.31
 SWAN_FILE="libreswan-${SWAN_VER}.tar.gz"
@@ -28,12 +28,12 @@ echo > /var/tmp/libreswan-nss-pwd
 /bin/rm -f /var/tmp/libreswan-nss-pwd
 
 # install libreswan into systemd
-systemctl enable ipsec.service
-systemctl start ipsec.service
+#systemctl enable ipsec.service
+#systemctl start ipsec.service
 
 touch /etc/ipsec.conf
 touch /etc/iptables.rules
 touch /etc/ipsec.secrets
 touch /etc/ppp/options.xl2tpd
 touch /etc/xl2tpd/xl2tpd.conf
-touch /etc/radiusclient/port-id-map
+# touch /etc/radiusclient/port-id-map

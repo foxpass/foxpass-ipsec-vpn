@@ -81,7 +81,7 @@
         "sudo mv /tmp/foxpass-vpn/scripts/sshd_config /etc/ssh/sshd_config",
         "sudo mv /tmp/foxpass-vpn/scripts/sysctl.conf /etc/sysctl.conf",
         "sudo mv /tmp/foxpass-vpn/scripts/iptablesload /etc/network/if-pre-up.d/iptablesload",
-        "sudo mv /tmp/foxpass-vpn/scripts/radiusclient.conf /etc/radiusclient",
+        "sudo mv /tmp/foxpass-vpn/static/radiusclient /etc/",
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.service /lib/systemd/system/",
         "sudo systemctl enable foxpass-radius-agent.service",

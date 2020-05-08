@@ -107,7 +107,7 @@ def get_mfa_type():
         elif (mfa_resp == 'n' or mfa_resp == 'N'):
             return ''
         else:
-            print "Please enter 'y' or 'n'"
+            print('Please enter `y` or `n`')
 
 
 def get_duo_data():

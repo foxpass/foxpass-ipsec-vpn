@@ -3,7 +3,7 @@
     "aws_access_key":"",
     "aws_secret_key":"",
     "region":"us-west-2",
-    "source_ami":"ami-0def3275"
+    "source_ami":"ami-09dd2e08d601bff67"
   },
   "builders":[
     {

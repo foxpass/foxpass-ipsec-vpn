@@ -290,7 +290,7 @@ def config_vpn(data):
     # set /etc/ipsec.secrets and foxpass-radius-agent.conf to be owned and only accessible by root
     # chmod 0o600 is r/w owner
     # chown 0 is set user to root
-    # chown 65534 is set user to nobody
+    # chown 65534 is set user to nobody:nogroup
     chmod('/etc/ipsec.secrets', 0o600)
     chown('/etc/ipsec.secrets', 0, 0)
     chmod('/etc/foxpass-radius-agent.conf', 0o600)

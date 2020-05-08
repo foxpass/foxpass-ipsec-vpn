@@ -35,4 +35,4 @@ RUN mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.servic
 RUN systemctl enable foxpass-radius-agent.service
 RUN chmod 744 /opt/bin/config.py"
 
-CMD python3 /opt/bin/setup.py
+CMD python3 /opt/bin/config.py

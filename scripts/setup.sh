@@ -29,7 +29,6 @@ echo > /var/tmp/libreswan-nss-pwd
 
 # install libreswan into systemd
 systemctl enable ipsec.service
-systemctl start ipsec.service
 
 touch /etc/ipsec.conf
 touch /etc/iptables.rules

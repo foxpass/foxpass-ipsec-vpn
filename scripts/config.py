@@ -296,9 +296,10 @@ def config_vpn(data):
     chmod('/etc/foxpass-radius-agent.conf', 0o600)
     chown('/etc/foxpass-radius-agent.conf', 65534, 65534)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
+    call(['/usr/bin/systemctl', 'enable', 'ipsec.service'], shell=False)
     for command in commands:
-        call(['/usr/sbin/service', command, 'stop'], shell=False)
-        call(['/usr/sbin/service', command, 'start'], shell=False)
+        call(['/usr/bin/systemctl', 'stop', command], shell=False)
+        call(['/usr/bin/systemctl', 'start', command], shell=False)
 
 
 def main():

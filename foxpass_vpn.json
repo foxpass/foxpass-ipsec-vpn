@@ -67,11 +67,13 @@
       "type": "shell",
       "inline": [
         "sudo apt-get -y update",
-        "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y libnss3-dev libnspr4-dev pkg-config libpam-dev libcap-ng-dev libcap-ng-utils libselinux-dev libcurl3-nss-dev flex bison gcc make libldns-dev libunbound-dev libnss3-tools libevent-dev libsystemd-dev git devscripts build-essential fakeroot libsystemd-dev python3-pip wget xl2tpd xmlto",
+        "sudo apt-get install -y libnss3-dev libnspr4-dev pkg-config libpam-dev libcap-ng-dev libcap-ng-utils libselinux-dev libcurl3-nss-dev flex bison gcc make libldns-dev libunbound-dev libnss3-tools libevent-dev libsystemd-dev git devscripts build-essential fakeroot libsystemd-dev python3-pip wget xl2tpd",
+        "sudo apt-get -y --no-install-recommends install xmlto",
         "sudo pip3 install -r /tmp/foxpass-vpn/requirements.txt",
         "sudo pip3 install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
       ]
-    },    {
+    },
+    {
       "type": "shell",
       "inline": [
         "sudo /tmp/foxpass-vpn/scripts/setup.sh",

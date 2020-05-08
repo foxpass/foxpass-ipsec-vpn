@@ -36,4 +36,3 @@ touch /etc/iptables.rules
 touch /etc/ipsec.secrets
 touch /etc/ppp/options.xl2tpd
 touch /etc/xl2tpd/xl2tpd.conf
-# touch /etc/radiusclient/port-id-map

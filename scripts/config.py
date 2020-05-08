@@ -195,7 +195,7 @@ def get_machine_data():
         data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers).text
     else:
         data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').text
-        data['private'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').text
+        data['private_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').text
 
     data['interface'] = get_adapter(data['private_ip'])
 
@@ -272,28 +272,29 @@ def config_vpn(data):
                  'xl2tpd.conf': '/etc/xl2tpd/',
                  'ipsec.conf': '/etc/',
                  'foxpass-radius-agent.conf': '/etc/',
-                 'servers': '/etc/radiusclients/'}
+                 'servers': '/etc/radiusclient/'}
 
     templates = '/opt/templates'
     files = {}
-    for file in file_list.iterkeys():
+    for file in file_list.keys():
         path = '{}/{}'.format(templates, file)
         files[file] = open(path, 'r').read()
-    for file, source in files.iteritems():
+    for file, source in files.items():
         dest = open(file_list[file] + file, 'w')
-        for orig, repl in holders.iteritems():
+        for orig, repl in holders.items():
             source = source.replace(orig, repl)
         dest.write(source)
         dest.close()
-    commands = ['xl2tpd', 'ipsec', 'fail2ban', 'foxpass-radius-agent']
+    commands = ['xl2tpd', 'ipsec', 'foxpass-radius-agent']
     call(['/sbin/sysctl', '-p'])
     # set /etc/ipsec.secrets and foxpass-radius-agent.conf to be owned and only accessible by root
-    # chmod 0600 is r/w owner
+    # chmod 0o600 is r/w owner
     # chown 0 is set user to root
-    chmod('/etc/ipsec.secrets', 0600)
+    # chown 65534 is set user to nobody
+    chmod('/etc/ipsec.secrets', 0o600)
     chown('/etc/ipsec.secrets', 0, 0)
-    chmod('/etc/foxpass-radius-agent.conf', 0600)
-    chown('/etc/foxpass-radius-agent.conf', 0, 0)
+    chmod('/etc/foxpass-radius-agent.conf', 0o600)
+    chown('/etc/foxpass-radius-agent.conf', 65534, 65534)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
     for command in commands:
         call(['/usr/sbin/service', command, 'stop'], shell=False)

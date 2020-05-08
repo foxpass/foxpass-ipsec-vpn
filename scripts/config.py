@@ -68,7 +68,7 @@ def check_cidr(target, default=None):
             if validate_cidr(cidr):
                 pass
             else:
-                print '{} is not a valid CIDR.'.format(cidr)
+                print('{} is not a valid CIDR.'.format(cidr))
             if int(cidr.split('/')[1]) > 27:
                 print('{} is too small, use a larger network size.'.format(cidr))
             else:

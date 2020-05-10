@@ -190,7 +190,7 @@ def get_machine_data():
 
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
-        gogle_path = 'computeMetadata/v1/instance/network-interfaces/0/'
+        google_path = 'computeMetadata/v1/instance/network-interfaces/0/'
         data['public_ip'] = requests.get(METADATA_BASE_URL + google_path + 'access-configs/0/external-ip', headers=headers).text
         data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers).text
     else:

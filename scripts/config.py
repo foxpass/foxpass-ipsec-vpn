@@ -178,7 +178,7 @@ def gather_user_data_s3(s3_url):
 
 
 def gather_user_data_file(filename):
-    return json.load(file(filename))
+    return json.load(open(filename))
 
 
 def get_machine_data():

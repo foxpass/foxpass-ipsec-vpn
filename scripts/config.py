@@ -140,7 +140,8 @@ def gather_user_data_prompt():
     data['psk'] = prompt('Enter PSK', default=random_string(32))
     data['dns_primary'] = check_ip('Primary DNS', '1.1.1.1')
     data['dns_secondary'] = check_ip('Secondary DNS', '1.0.0.1')
-    data['local_cidr'] = check_cidr('VPN IPv4 local CIDR', '10.11.12.0/24')
+    data['l2tp_cidr'] = check_cidr('L2TP IPv4 range (CIDR)', '10.11.12.0/24')
+    data['xauth_cidr'] = check_cidr('XAUTH IPv4 range (CIDR)', '10.11.13.0/24')
 
     mfa_type = get_mfa_type()
     data['mfa_type'] = mfa_type
@@ -244,14 +245,20 @@ def config_vpn(data):
         okta_hostname = data['okta_config'].get('hostname')
         okta_apikey = data['okta_config'].get('apikey')
 
-    local_ip_range = IpRange(data['local_cidr'])[10] + '-' + IpRange(data['local_cidr'])[len(IpRange(data['local_cidr'])) - 5]
-    local_ip = IpRange(data['local_cidr'])[1]
+    l2tp_ip_range = IpRange(data['l2tp_cidr'])[10] + '-' + IpRange(data['l2tp_cidr'])[len(IpRange(data['l2tp_cidr'])) - 5]
+    l2tp_local_ip = IpRange(data['l2tp_cidr'])[1]
+
+    xauth_ip_range = IpRange(data['xauth_cidr'])[10] + '-' + IpRange(data['xauth_cidr'])[len(IpRange(data['xauth_cidr'])) - 5]
+    xauth_local_ip = IpRange(data['xauth_cidr'])[1]
+
     holders = {'<PSK>': data['psk'],
                '<DNS_PRIMARY>': data['dns_primary'],
                '<DNS_SECONDARY>': data['dns_secondary'],
-               '<IP_RANGE>': local_ip_range,
+               '<L2TP_IP_RANGE>': l2tp_ip_range,
+               '<XAUTH_IP_RANGE>': xauth_ip_range,
                '<LOCAL_IP>': local_ip,
-               '<LOCAL_SUBNET>': data['local_cidr'],
+               '<L2TP_CIDR>': data['l2tp_cidr'],
+               '<XAUTH_CIDR>': data['xauth_cidr'],
                '<PUBLIC_IP>': data['public_ip'],
                '<PRIVATE_IP>': data['private_ip'],
                '<INTERFACE>': data['interface'],

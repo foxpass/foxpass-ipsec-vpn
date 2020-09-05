@@ -279,7 +279,8 @@ def config_vpn(data):
                  'xl2tpd.conf': '/etc/xl2tpd/',
                  'ipsec.conf': '/etc/',
                  'foxpass-radius-agent.conf': '/etc/',
-                 'servers': '/etc/radiusclient/'}
+                 'servers': '/etc/radiusclient/',
+                 'pam_radius_auth.conf': '/etc/'}
 
     templates = '/opt/templates'
     files = {}

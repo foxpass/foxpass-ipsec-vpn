@@ -30,7 +30,6 @@ RUN mv /tmp/foxpass-vpn/scripts/sysctl.conf /etc/sysctl.conf
 # docker does not have this directory
 # RUN mv /tmp/foxpass-vpn/scripts/iptablesload /etc/network/if-pre-up.d/iptablesload
 RUN mv /tmp/foxpass-vpn/static/radiusclient /etc
-RUN mv /tmp/foxpass-vpn/static/pam_radius_auth.conf /etc/
 RUN mv /tmp/foxpass-vpn/static/pluto /etc/pam.d/
 RUN mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin
 RUN mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.service /lib/systemd/system/

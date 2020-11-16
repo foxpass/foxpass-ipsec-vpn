@@ -5,3 +5,4 @@ pyasn1==0.4.8
 python-hosts==1.0.0
 pyOpenSSL==19.1.0
 requests==2.23.0
+greenlet==0.4.15

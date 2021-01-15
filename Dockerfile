@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 #WORKDIR /app
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3-dev libnspr4-dev pkg-config libpam-dev \
- libcap-ng-dev libcap-ng-utils libselinux-dev \
+ libcap-ng-dev libcap-ng-utils libselinux-dev libpam-radius-auth \
  libcurl3-nss-dev flex bison gcc make libldns-dev \
  libunbound-dev libnss3-tools libevent-dev \
  libsystemd-dev git devscripts build-essential fakeroot libsystemd-dev python3-pip wget xl2tpd xmlto
@@ -30,6 +30,7 @@ RUN mv /tmp/foxpass-vpn/scripts/sysctl.conf /etc/sysctl.conf
 # docker does not have this directory
 # RUN mv /tmp/foxpass-vpn/scripts/iptablesload /etc/network/if-pre-up.d/iptablesload
 RUN mv /tmp/foxpass-vpn/static/radiusclient /etc
+RUN mv /tmp/foxpass-vpn/static/pluto /etc/pam.d/
 RUN mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin
 RUN mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.service /lib/systemd/system/
 RUN systemctl enable foxpass-radius-agent.service

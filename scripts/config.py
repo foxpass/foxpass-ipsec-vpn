@@ -256,7 +256,7 @@ def config_vpn(data):
                '<DNS_SECONDARY>': data['dns_secondary'],
                '<L2TP_IP_RANGE>': l2tp_ip_range,
                '<XAUTH_IP_RANGE>': xauth_ip_range,
-               '<LOCAL_IP>': local_ip,
+               '<L2TP_LOCAL_IP>': l2tp_local_ip,
                '<L2TP_CIDR>': data['l2tp_cidr'],
                '<XAUTH_CIDR>': data['xauth_cidr'],
                '<PUBLIC_IP>': data['public_ip'],

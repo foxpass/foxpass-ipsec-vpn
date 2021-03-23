@@ -26,6 +26,7 @@
 
 # system libs
 import json
+import os
 import random
 import requests
 import socket
@@ -41,6 +42,7 @@ from urllib.parse import urlparse
 import ifaddr
 from iptools import IpRange
 from iptools.ipv4 import validate_cidr
+from jinja2 import Environment, FileSystemLoader
 from python_hosts import Hosts, HostsEntry
 
 # require running as root
@@ -125,7 +127,7 @@ def get_okta_data():
 
 def is_gce():
     try:
-        response = requests.get(METADATA_BASE_URL)
+        response = requests.get(METADATA_BASE_URL, timeout=.1)
         try:
             return response.headers['Metadata-Flavor'] == 'Google'
         finally:
@@ -175,11 +177,25 @@ def gather_user_data_s3(s3_url):
     obj = s3.Object(bucket_name, path)
     data = obj.get()['Body'].read().decode('utf-8')
 
-    return json.loads(data)
+    config = json.loads(data)
+
+    # if it has 'local_cidr', then use that value for l2tp_cidr
+    local_cidr = config.pop('local_cidr', None)
+    if local_cidr:
+        config['l2tp_cidr'] = local_cidr
+
+    return config
 
 
 def gather_user_data_file(filename):
-    return json.load(open(filename))
+    config = json.load(open(filename))
+
+    # if it has 'local_cidr', then use that value for l2tp_cidr
+    local_cidr = config.pop('local_cidr', None)
+    if local_cidr:
+        config['l2tp_cidr'] = local_cidr
+
+    return config
 
 
 def get_machine_data():
@@ -192,16 +208,15 @@ def get_machine_data():
     if data['is_gce']:
         headers = {'Metadata-Flavor': 'Google'}
         google_path = 'computeMetadata/v1/instance/network-interfaces/0/'
-        data['public_ip'] = requests.get(METADATA_BASE_URL + google_path + 'access-configs/0/external-ip', headers=headers).text
-        data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers).text
+        data['public_ip'] = requests.get(METADATA_BASE_URL + google_path + 'access-configs/0/external-ip', headers=headers, timeout=.1).text
+        data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers, timeout=.1).text
     else:
-        data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4').text
-        data['private_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4').text
+        data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4', timeout=.1).text
+        data['private_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4', timeout=.1).text
 
     data['interface'] = get_adapter(data['private_ip'])
 
     return data
-
 
 def get_adapter(private_ip):
     adapters = ifaddr.get_adapters()
@@ -245,32 +260,36 @@ def config_vpn(data):
         okta_hostname = data['okta_config'].get('hostname')
         okta_apikey = data['okta_config'].get('apikey')
 
-    l2tp_ip_range = IpRange(data['l2tp_cidr'])[10] + '-' + IpRange(data['l2tp_cidr'])[len(IpRange(data['l2tp_cidr'])) - 5]
-    l2tp_local_ip = IpRange(data['l2tp_cidr'])[1]
+    l2tp_ip_range_obj = IpRange(data['l2tp_cidr'])
+    l2tp_ip_range = "{}-{}".format(l2tp_ip_range_obj[10],
+                                   l2tp_ip_range_obj[-6])
+    l2tp_local_ip = l2tp_ip_range_obj[1]
 
-    xauth_ip_range = IpRange(data['xauth_cidr'])[10] + '-' + IpRange(data['xauth_cidr'])[len(IpRange(data['xauth_cidr'])) - 5]
-    xauth_local_ip = IpRange(data['xauth_cidr'])[1]
+    xauth_ip_range_obj = IpRange(data['xauth_cidr'])
+    xauth_ip_range = "{}-{}".format(xauth_ip_range_obj[10],
+                                    xauth_ip_range_obj[-6])
+    xauth_local_ip = xauth_ip_range_obj[1]
 
-    holders = {'<PSK>': data['psk'],
-               '<DNS_PRIMARY>': data['dns_primary'],
-               '<DNS_SECONDARY>': data['dns_secondary'],
-               '<L2TP_IP_RANGE>': l2tp_ip_range,
-               '<XAUTH_IP_RANGE>': xauth_ip_range,
-               '<LOCAL_IP>': local_ip,
-               '<L2TP_CIDR>': data['l2tp_cidr'],
-               '<XAUTH_CIDR>': data['xauth_cidr'],
-               '<PUBLIC_IP>': data['public_ip'],
-               '<PRIVATE_IP>': data['private_ip'],
-               '<INTERFACE>': data['interface'],
-               '<RADIUS_SECRET>': data['radius_secret'],
-               '<API_KEY>': data['foxpass_api_key'],
-               '<REQUIRE_GROUPS>': ','.join(data['require_groups']) if 'require_groups' in data else '',
-               '<MFA_TYPE>': mfa_type,
-               '<DUO_API_HOST>': duo_api_host,
-               '<DUO_IKEY>': duo_ikey,
-               '<DUO_SKEY>': duo_skey,
-               '<OKTA_HOSTNAME>': okta_hostname,
-               '<OKTA_APIKEY>': okta_apikey
+    context = {'PSK': data['psk'],
+               'DNS_PRIMARY': data['dns_primary'],
+               'DNS_SECONDARY': data['dns_secondary'],
+               'L2TP_IP_RANGE': l2tp_ip_range,
+               'L2TP_LOCAL_IP': l2tp_local_ip,
+               'L2TP_CIDR': data['l2tp_cidr'],
+               'XAUTH_IP_RANGE': xauth_ip_range,
+               'XAUTH_CIDR': data['xauth_cidr'],
+               'PUBLIC_IP': data['public_ip'],
+               'PRIVATE_IP': data['private_ip'],
+               'INTERFACE': data['interface'],
+               'RADIUS_SECRET': data['radius_secret'],
+               'API_KEY': data['foxpass_api_key'],
+               'REQUIRE_GROUPS': ','.join(data['require_groups']) if 'require_groups' in data else '',
+               'MFA_TYPE': mfa_type,
+               'DUO_API_HOST': duo_api_host,
+               'DUO_IKEY': duo_ikey,
+               'DUO_SKEY': duo_skey,
+               'OKTA_HOSTNAME': okta_hostname,
+               'OKTA_APIKEY': okta_apikey
                }
 
     file_list = {'ipsec.secrets': '/etc/',
@@ -282,17 +301,19 @@ def config_vpn(data):
                  'servers': '/etc/radiusclient/',
                  'pam_radius_auth.conf': '/etc/'}
 
-    templates = '/opt/templates'
+    # initialize jinja to process conf files
+    env = Environment(
+        loader=FileSystemLoader('/opt/templates')
+    )
+
     files = {}
-    for file in file_list.keys():
-        path = '{}/{}'.format(templates, file)
-        files[file] = open(path, 'r').read()
-    for file, source in files.items():
-        dest = open(file_list[file] + file, 'w')
-        for orig, repl in holders.items():
-            source = source.replace(orig, repl)
-        dest.write(source)
-        dest.close()
+    for (filename, dir) in file_list.items():
+        path = os.path.join(dir, filename)
+        template = env.get_template(filename)
+        with open(path, "w") as f:
+            rendered = template.render(**context)
+            f.write(rendered)
+
     commands = ['xl2tpd', 'ipsec', 'foxpass-radius-agent']
     call(['/sbin/sysctl', '-p'])
     # set /etc/ipsec.secrets and foxpass-radius-agent.conf to be owned and only accessible by root

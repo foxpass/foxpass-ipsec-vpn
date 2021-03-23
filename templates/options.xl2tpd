@@ -1,7 +1,7 @@
 ipcp-accept-local
 ipcp-accept-remote
-ms-dns <DNS_PRIMARY>
-ms-dns <DNS_SECONDARY>
+ms-dns {{ DNS_PRIMARY }}
+ms-dns {{ DNS_SECONDARY }}
 noccp
 auth
 crtscts

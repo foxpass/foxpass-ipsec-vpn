@@ -283,6 +283,7 @@ def config_vpn(data):
                'INTERFACE': data['interface'],
                'RADIUS_SECRET': data['radius_secret'],
                'API_KEY': data['foxpass_api_key'],
+               'API_HOST': data.get('foxpass_api_url', 'https://api.foxpass.com'),
                'REQUIRE_GROUPS': ','.join(data['require_groups']) if 'require_groups' in data else '',
                'MFA_TYPE': mfa_type,
                'DUO_API_HOST': duo_api_host,

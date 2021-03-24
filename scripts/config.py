@@ -239,59 +239,55 @@ def modify_etc_hosts(data):
 
 
 def config_vpn(data):
-    mfa_type = ''
-
-    duo_api_host = ''
-    duo_ikey = ''
-    duo_skey = ''
-
-    okta_hostname = ''
-    okta_apikey = ''
-
-    if 'mfa_type' in data:
-        mfa_type = data['mfa_type']
-
-    if 'duo_config' in data:
-        duo_api_host = data['duo_config'].get('api_host')
-        duo_ikey = data['duo_config'].get('ikey')
-        duo_skey = data['duo_config'].get('skey')
-
-    if 'okta_config' in data:
-        okta_hostname = data['okta_config'].get('hostname')
-        okta_apikey = data['okta_config'].get('apikey')
-
-    l2tp_ip_range_obj = IpRange(data['l2tp_cidr'])
-    l2tp_ip_range = "{}-{}".format(l2tp_ip_range_obj[10],
-                                   l2tp_ip_range_obj[-6])
-    l2tp_local_ip = l2tp_ip_range_obj[1]
-
-    xauth_ip_range_obj = IpRange(data['xauth_cidr'])
-    xauth_ip_range = "{}-{}".format(xauth_ip_range_obj[10],
-                                    xauth_ip_range_obj[-6])
-    xauth_local_ip = xauth_ip_range_obj[1]
-
     context = {'PSK': data['psk'],
                'DNS_PRIMARY': data['dns_primary'],
                'DNS_SECONDARY': data['dns_secondary'],
-               'L2TP_IP_RANGE': l2tp_ip_range,
-               'L2TP_LOCAL_IP': l2tp_local_ip,
-               'L2TP_CIDR': data['l2tp_cidr'],
-               'XAUTH_IP_RANGE': xauth_ip_range,
-               'XAUTH_CIDR': data['xauth_cidr'],
                'PUBLIC_IP': data['public_ip'],
                'PRIVATE_IP': data['private_ip'],
                'INTERFACE': data['interface'],
                'RADIUS_SECRET': data['radius_secret'],
                'API_KEY': data['foxpass_api_key'],
-               'API_HOST': data.get('foxpass_api_url', 'https://api.foxpass.com'),
-               'REQUIRE_GROUPS': ','.join(data['require_groups']) if 'require_groups' in data else '',
-               'MFA_TYPE': mfa_type,
-               'DUO_API_HOST': duo_api_host,
-               'DUO_IKEY': duo_ikey,
-               'DUO_SKEY': duo_skey,
-               'OKTA_HOSTNAME': okta_hostname,
-               'OKTA_APIKEY': okta_apikey
-               }
+               'API_HOST': data.get('foxpass_api_url', 'https://api.foxpass.com')
+              }
+
+    if 'require_groups' in data:
+        context['REQUIRE_GROUPS'] = ','.join(data['require_groups'])
+
+    if 'mfa_type' in data:
+        context['MFA_TYPE'] = data.get('mfa_type')
+
+    if 'duo_config' in data:
+        context.update({'DUO_API_HOST': data['duo_config'].get('api_host'),
+                        'DUO_IKEY': data['duo_config'].get('ikey'),
+                        'DUO_SKEY': data['duo_config'].get('skey')})
+
+    if 'okta_config' in data:
+        context.update({'OKTA_HOSTNAME': data['okta_config'].get('hostname'),
+                        'OKTA_APIKEY': data['okta_config'].get('apikey')})
+
+    l2tp_cidr = data.get('l2tp_cidr')
+    if l2tp_cidr:
+        l2tp_ip_range_obj = IpRange(data['l2tp_cidr'])
+        l2tp_ip_range = "{}-{}".format(l2tp_ip_range_obj[10],
+                                       l2tp_ip_range_obj[-6])
+        l2tp_local_ip = l2tp_ip_range_obj[1]
+        context.update({
+               'L2TP_IP_RANGE': l2tp_ip_range,
+               'L2TP_LOCAL_IP': l2tp_local_ip,
+               'L2TP_CIDR': l2tp_cidr,
+        })
+
+    xauth_cidr = data.get('xauth_cidr')
+    if xauth_cidr:
+        xauth_ip_range_obj = IpRange(data['xauth_cidr'])
+        xauth_ip_range = "{}-{}".format(xauth_ip_range_obj[10],
+                                        xauth_ip_range_obj[-6])
+        xauth_local_ip = xauth_ip_range_obj[1]
+
+        context.update({
+               'XAUTH_IP_RANGE': xauth_ip_range,
+               'XAUTH_CIDR': xauth_cidr,
+        })
 
     file_list = {'ipsec.secrets': '/etc/',
                  'iptables.rules': '/etc/',

@@ -1,1 +1,1 @@
-localhost   <RADIUS_SECRET>
+localhost   {{ RADIUS_SECRET }}

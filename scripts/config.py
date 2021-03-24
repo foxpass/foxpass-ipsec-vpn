@@ -300,7 +300,8 @@ def config_vpn(data):
 
     # initialize jinja to process conf files
     env = Environment(
-        loader=FileSystemLoader('/opt/templates')
+        loader=FileSystemLoader('/opt/templates'),
+        keep_trailing_newline=True
     )
 
     files = {}

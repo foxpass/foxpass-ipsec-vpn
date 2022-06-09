@@ -323,6 +323,7 @@ def config_vpn(data):
     chmod('/etc/foxpass-radius-agent.conf', 0o600)
     chown('/etc/foxpass-radius-agent.conf', 65534, 65534)
     call('/sbin/iptables-restore < /etc/iptables.rules', shell=True)
+    call('/usr/sbin/netfilter-persistent save', shell=True)
     call(['/usr/bin/systemctl', 'enable', 'ipsec.service'], shell=False)
     for command in commands:
         call(['/usr/bin/systemctl', 'stop', command], shell=False)

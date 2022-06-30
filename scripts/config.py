@@ -179,31 +179,11 @@ def gather_user_data_s3(s3_url):
 
     config = json.loads(data)
 
-    # if it has 'l2tp_cidr', then use that value for l2tp_cidr
-    l2tp_cidr = config.pop('l2tp_cidr', None)
-    if l2tp_cidr:
-        config['l2tp_cidr'] = l2tp_cidr
-
-    # if it has 'xauth_cidr', then use that value for xauth_cidr
-    xauth_cidr = config.pop('xauth_cidr', None)
-    if xauth_cidr:
-        config['xauth_cidr'] = xauth_cidr
-
     return config
 
 
 def gather_user_data_file(filename):
     config = json.load(open(filename))
-
-    # if it has 'l2tp_cidr', then use that value for l2tp_cidr
-    l2tp_cidr = config.pop('l2tp_cidr', None)
-    if l2tp_cidr:
-        config['l2tp_cidr'] = l2tp_cidr
-
-    # if it has 'xauth_cidr', then use that value for xauth_cidr
-    xauth_cidr = config.pop('xauth_cidr', None)
-    if xauth_cidr:
-        config['xauth_cidr'] = xauth_cidr
 
     return config
 

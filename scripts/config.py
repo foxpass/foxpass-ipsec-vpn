@@ -179,11 +179,20 @@ def gather_user_data_s3(s3_url):
 
     config = json.loads(data)
 
+    # if it has 'local_cidr', then use that value for l2tp_cidr
+    local_cidr = config.pop('local_cidr', None)
+    if local_cidr:
+        config['l2tp_cidr'] = local_cidr
     return config
 
 
 def gather_user_data_file(filename):
     config = json.load(open(filename))
+
+    # if it has 'local_cidr', then use that value for l2tp_cidr
+    local_cidr = config.pop('local_cidr', None)
+    if local_cidr:
+        config['l2tp_cidr'] = local_cidr
 
     return config
 

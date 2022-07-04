@@ -183,6 +183,7 @@ def gather_user_data_s3(s3_url):
     local_cidr = config.pop('local_cidr', None)
     if local_cidr:
         config['l2tp_cidr'] = local_cidr
+
     return config
 
 

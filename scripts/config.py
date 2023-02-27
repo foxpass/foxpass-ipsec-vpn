@@ -211,8 +211,13 @@ def get_machine_data():
         data['public_ip'] = requests.get(METADATA_BASE_URL + google_path + 'access-configs/0/external-ip', headers=headers, timeout=.1).text
         data['private_ip'] = requests.get(METADATA_BASE_URL + google_path + 'ip', headers=headers, timeout=.1).text
     else:
-        data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4', timeout=.1).text
-        data['private_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4', timeout=.1).text
+        token_headers = None
+        http_headers = { 'X-aws-ec2-metadata-token-ttl-seconds': '600', 'content-type': 'application/json'}
+        token = requests.put(METADATA_BASE_URL + 'latest/api/token', timeout=.1, headers=http_headers).text
+        if token:
+            token_headers = {'X-aws-ec2-metadata-token': token, "content-type": 'application/json'}
+        data['public_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/public-ipv4', timeout=.1, headers=token_headers).text
+        data['private_ip'] = requests.get(METADATA_BASE_URL + 'latest/meta-data/local-ipv4', timeout=.1, headers=token_headers).text
 
     data['interface'] = get_adapter(data['private_ip'])
 

@@ -6,4 +6,4 @@ pyasn1==0.4.8
 python-hosts==1.0.0
 pyOpenSSL==19.1.0
 requests==2.31.0
-urllib3==1.26.5
+urllib3==1.26.17

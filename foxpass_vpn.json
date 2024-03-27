@@ -2,8 +2,7 @@
   "variables":{
     "aws_access_key":"",
     "aws_secret_key":"",
-    "region":"us-west-2",
-    "source_ami":"ami-07dd19a7900a1f049"
+    "region":"us-west-2"
   },
   "builders":[
     {
@@ -22,7 +21,6 @@
           "name": "ubuntu/images/*ubuntu-focal-22.04-amd64-server-*",
           "root-device-type": "ebs"
         },
-        "owners": ["099720109477"],
         "most_recent": true
       }
     }

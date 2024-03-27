@@ -15,7 +15,16 @@
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{isotime \"2006-01-02 15.04\"}}",
       "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
+      "ssh_timeout" : "15m",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-focal-22.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      }
     }
   ],
   "provisioners":[

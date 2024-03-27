@@ -2,8 +2,7 @@
   "variables":{
     "aws_access_key":"",
     "aws_secret_key":"",
-    "region":"us-west-2",
-    "source_ami":"ami-07dd19a7900a1f049"
+    "region":"us-west-2"
   },
   "builders":[
     {
@@ -15,7 +14,15 @@
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{isotime \"2006-01-02 15.04\"}}",
       "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
+      "ssh_timeout" : "15m",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-focal-22.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "most_recent": true
+      }
     }
   ],
   "provisioners":[

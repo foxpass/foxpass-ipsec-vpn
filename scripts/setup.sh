@@ -5,7 +5,7 @@ set -e
 
 mkdir -p /opt/src
 cd /opt/src
-SWAN_VER=3.31
+SWAN_VER=4.14
 SWAN_FILE="libreswan-${SWAN_VER}.tar.gz"
 SWAN_URL="https://download.libreswan.org/$SWAN_FILE"
 wget -t 3 -T 30 -nv -O "$SWAN_FILE" "$SWAN_URL"

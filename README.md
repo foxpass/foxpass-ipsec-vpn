@@ -35,7 +35,7 @@ for Google Cloud Platform :
 
   ```
   ssh ubuntu@<hostname-or-ip>
-  sudo /opt/bin/config.py
+  sudo /opt/foxpass-vpn/config.py
   ```
 
 * To automatically pull config from S3 (optional)
@@ -43,7 +43,7 @@ for Google Cloud Platform :
 
    ```
     #!/bin/bash
-    sudo /opt/bin/config.py s3://bucket-name/path/to/config.json
+    sudo /opt/foxpass-vpn/config.py s3://bucket-name/path/to/config.json
    ```
    This will run the config script on startup, you will not need to run the config script manually.
 

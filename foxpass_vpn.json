@@ -2,8 +2,7 @@
   "variables":{
     "aws_access_key":"",
     "aws_secret_key":"",
-    "region":"us-west-2",
-    "source_ami":"ami-07dd19a7900a1f049"
+    "region":"us-west-2"
   },
   "builders":[
     {
@@ -15,7 +14,16 @@
       "instance_type":"t2.nano",
       "ami_name":"foxpass-ipsec-vpn {{isotime \"2006-01-02 15.04\"}}",
       "ssh_username":"ubuntu",
-      "ssh_timeout" : "15m"
+      "ssh_timeout" : "15m",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+      }
     }
   ],
   "provisioners":[
@@ -67,8 +75,12 @@
       "type": "shell",
       "inline": [
         "sudo DEBIAN_FRONTEND=noninteractive apt-get -y update",
-        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3-dev libnspr4-dev pkg-config libpam-dev libpam-radius-auth libcap-ng-dev libcap-ng-utils libselinux-dev libcurl3-nss-dev flex bison gcc make libldns-dev libunbound-dev libnss3-tools libevent-dev libsystemd-dev git devscripts build-essential fakeroot libsystemd-dev python3-pip wget xl2tpd iptables-persistent",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y libnss3-dev libnspr4-dev pkg-config libpam-dev libpam-radius-auth libcap-ng-dev libcap-ng-utils libselinux-dev libcurl3-nss-dev flex bison gcc make libldns-dev libunbound-dev libnss3-tools libevent-dev libsystemd-dev git devscripts build-essential fakeroot libsystemd-dev python3-pip wget xl2tpd iptables-persistent virtualenv",
         "sudo DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install xmlto",
+        "sudo mkdir /opt/foxpass-vpn",
+        "sudo mkdir /opt/bin",
+        "sudo virtualenv /opt/foxpass-vpn/env/",
+        ". /opt/foxpass-vpn/env/bin/activate",
         "sudo pip3 install -r /tmp/foxpass-vpn/requirements.txt",
         "sudo pip3 install -r /tmp/foxpass-vpn/foxpass-radius-agent/requirements.txt"
       ]
@@ -77,9 +89,8 @@
       "type": "shell",
       "inline": [
         "sudo /tmp/foxpass-vpn/scripts/setup.sh",
-        "sudo mkdir /opt/bin",
         "sudo mv /tmp/foxpass-vpn/templates /opt/",
-        "sudo mv /tmp/foxpass-vpn/scripts/config.py /opt/bin/config.py",
+        "sudo mv /tmp/foxpass-vpn/scripts/config.py /opt/foxpass-vpn/config.py",
         "sudo mv /tmp/foxpass-vpn/scripts/sshd_config /etc/ssh/sshd_config",
         "sudo mv /tmp/foxpass-vpn/scripts/sysctl.conf /etc/sysctl.conf",
         "sudo mv /tmp/foxpass-vpn/scripts/iptablesload /etc/network/if-pre-up.d/iptablesload",
@@ -88,7 +99,8 @@
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/foxpass-radius-agent.py /usr/local/bin",
         "sudo mv /tmp/foxpass-vpn/foxpass-radius-agent/systemd/foxpass-radius-agent.service /lib/systemd/system/",
         "sudo systemctl enable foxpass-radius-agent.service",
-        "sudo chmod 744 /opt/bin/config.py"
+        "sudo chmod 744 /opt/foxpass-vpn/config.py",
+        "sudo ln -s /opt/foxpass-vpn/config.py /opt/bin/config.py"
       ]
     }
   ]

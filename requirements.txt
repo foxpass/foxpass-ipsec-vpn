@@ -5,5 +5,5 @@ jinja2==3.1.6
 pyasn1==0.4.8
 python-hosts==1.0.0
 pyOpenSSL==19.1.0
-requests==2.32.0
-urllib3==1.26.19
+requests==2.32.4
+urllib3==2.5.0
